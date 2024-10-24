@@ -1,0 +1,122 @@
+/* Modified CSS Reset */
+/* Box-sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Reset Margin and Padding */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* Typography */
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Media Defaults */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  max-inline-size: 100%;
+}
+
+/* Form Elements */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Text Overflow */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/* Reset Margins */
+h1,
+h2,
+h3,
+h4,
+h5,
+figure,
+p,
+ol,
+ul {
+  margin: 0;
+}
+
+ol[role='list'],
+ul[role='list'] {
+  list-style: none;
+  padding-inline: 0;
+}
+
+/* Root Stacking Context */
+#root,
+#__next {
+  isolation: isolate;
+}
+
+/* Root CSS Variables for Themes */
+:root {
+  --background-color: #ffffff;
+  --text-color: rgb(10, 10, 13);
+  --button-bg-color: #f9f9f9;
+  --button-text-color: #000;
+}
+
+body {
+  font-family: Poppins, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  overflow-x: hidden;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1 {
+  font-size: 3em;
+  line-height: 1.1;
+  padding-bottom: 10px;
+  font-family: Poppins, Helvetica, sans-serif;
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* Dark Theme Variables */
+body.dark {
+  --background-color: #121212;
+  --text-color: #ffffff;
+  --button-bg-color: #333333;
+  --button-text-color: #ffffff;
+}
+
+button {
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+}
