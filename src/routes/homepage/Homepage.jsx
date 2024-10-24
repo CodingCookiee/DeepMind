@@ -1,9 +1,20 @@
-import React from 'react'
+import './homepage.css'
+import React from 'react';
+import PropTypes from 'prop-types';
 
-export default function Homepage() {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+
+const Homepage = () => {
+    return (
+        <div className='homepage'>
+            Homepage
+        </div>
+    );
+};
+
+
+Homepage.propTypes = {
+
+};
+
+
+export default Homepage;
