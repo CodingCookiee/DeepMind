@@ -10,6 +10,8 @@ import RootLayout from './layouts/rootLayout'
 import DashBoardLayout from './layouts/dashboardLayout/dashBoardLayout'
 import SignInPage from './routes/signinPage/signInPage'
 import SignUpPage from './routes/signupPage/signUpPage'
+import { ThemeProvider } from './ThemeContext';
+
 
 
 const router = createBrowserRouter([
@@ -49,6 +51,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+  <ThemeProvider>
      <RouterProvider router={router} />
+     </ThemeProvider>
   </React.StrictMode>,
 )
