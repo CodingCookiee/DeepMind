@@ -1,0 +1,37 @@
+.bot{
+    animation: 3s ease-in-out infinite alternate botAnimation;
+}
+
+
+.orbital{
+    animation: 100s linear infinite rotateOrbital;
+}
+
+
+.bg {
+    background-image: url('/bg1.png'); 
+    width: 80%;        
+    height: 85%;
+    background-size: contain;    
+    background-position: center;
+    background-repeat: no-repeat;  
+    /* z-index: 1;  */
+}
+
+@keyframes rotateOrbital {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(60deg);
+    }
+  }
+
+@keyframes botAnimation {
+  from {
+    transform: scale(1) rotate(0deg);
+  }
+  to {
+    transform: scale(1.1) rotate(-5deg);
+  }
+}
