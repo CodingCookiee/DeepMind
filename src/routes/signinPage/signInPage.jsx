@@ -1,20 +1,15 @@
 import './signinPage.css'
-import React from 'react';
-import PropTypes from 'prop-types';
+import { SignIn } from '@clerk/clerk-react'
 
 
-const signInPage = () => {
+
+const SignInPage = () => {
     return (
         <div className='signinPage'>
-            signInPage
+        <SignIn path="/sign-in" />
         </div>
     );
 };
 
+export default SignInPage;
 
-signInPage.propTypes = {
-
-};
-
-
-export default signInPage;
