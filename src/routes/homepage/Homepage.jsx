@@ -7,9 +7,12 @@ import { TypeAnimation } from "react-type-animation";
 const Homepage = () => {
   const { theme } = useContext(ThemeContext);
   const orbitalOpacity = theme === "dark" ? 0.05 : 0.3;
-  const bgColorClass = theme === "light" ? "bg-transparent" : "bg-slate-950";
+  const bgColorClass = theme === "light" ? "bg-slate-200" : "bg-slate-950";
   const bgOpacity = theme === "light" ? "opacity-100" : "opacity-50";
+  const bgChat = theme === 'light' ? 'bg-slate-100' : 'bg-slate-900';
+  const termsColor = theme === 'dark' ? 'text-gray-400' :  'text-black '
   const [typingStatus, setTypingStatus] = useState('Human1')
+
   return (
     <div className="homepage flex items-center gap-28 h-screen relative ">
       <img
@@ -52,8 +55,8 @@ const Homepage = () => {
             alt=""
             className="bot h-full w-full object-contain"
           />
-          <div className="chat absolute  
-          flex items-center gap-2 p-5 bg-slate-900 rounded-2xl">
+          <div className={`chat absolute  
+          flex items-center gap-2 p-5 ${bgChat} rounded-2xl`}>
           <img src={typingStatus === 'Human1' ? '/human1.jpeg' : typingStatus === 'Human2' ? '/human2.jpeg' : '/bot.png'} alt="" className="w-8 h-8 rounded-2xl object-cover	"/>
             <TypeAnimation
               sequence={[
@@ -86,8 +89,8 @@ const Homepage = () => {
       </div>
       <div className='terms absolute bottom-20 left-2/4	-translate-x-2/4
       flex flex-col items-center gap-1'>
-        <img src="/logo-light.png" alt="" className="bg-white rounded-full p-1	 w-7 h-7"/>
-        <div className="links flex gap-1 text-gray-400">
+        <img src={theme === 'light' ? '/logo-dark.png': '/logo-light.png'} alt="" className="bg-white rounded-full p-1	 w-7 h-7"/>
+        <div className={`links flex gap-1 ${termsColor}`}>
             <Link to='/' className="font-extralight text-xs	">Terms of Service</Link>
             <span></span>
             <Link to='/' className="font-extralight text-xs	">Privacy Policy</Link>
