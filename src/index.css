@@ -8,8 +8,7 @@
   --text-color: rgb(10, 10, 13);
   --button-bg-color: #f9f9f9;
   --button-text-color: #000;
-  
-
+  overflow-y: scroll;
 }
 
 body {
@@ -25,18 +24,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1 {
-  font-size: 3em;
-  line-height: 1.1;
-  padding-bottom: 10px;
-  font-family: Poppins, Helvetica, sans-serif;
-  font-weight: bold;
-  font-style: normal;
-}
 
 /* Dark Theme Variables */
 [data-theme='dark'] {
-  --background-color: #181717;
+  --background-color: #0a0a0a;
   --text-color: #ffffff;
   --button-bg-color: #333333;
   --button-text-color: #ffffff;

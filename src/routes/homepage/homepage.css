@@ -1,22 +1,25 @@
+
 .bot{
     animation: 3s ease-in-out infinite alternate botAnimation;
 }
 
 
 .orbital{
-    animation: 100s linear infinite rotateOrbital;
+    animation: 100s linear infinite  rotateOrbital;
 }
-
 
 .bg {
-    background-image: url('/bg1.png'); 
-    width: 80%;        
-    height: 85%;
-    background-size: contain;    
-    background-position: center;
-    background-repeat: no-repeat;  
-    /* z-index: 1;  */
+  background-image: url('/bg1.png');
+  height: 100%;
+  width: 200%; 
+  animation: 8s ease-in-out infinite alternate slideBg;
 }
+
+.chat{
+  bottom: -40px;
+  right:-50px;
+}
+
 
 @keyframes rotateOrbital {
     from {
@@ -33,5 +36,104 @@
   }
   to {
     transform: scale(1.1) rotate(-5deg);
+  }
+}
+
+
+@keyframes slideBg {
+  from {
+      transform: translateX(0);
+  }
+  to {
+      transform: translateX(-30%); 
+  }
+}
+
+
+/* Media queries */
+/* @media screen and (max-width: 1280px) {
+  .chat {
+    right: 0;
+  }
+} */
+
+@media screen and (max-width: 800px) {
+  .homepage {
+    flex-direction: column;
+    gap: 0px;
+    align-items: center;
+    padding: 0 20px;
+  }
+
+  .left,
+  .right {
+    width: 90%;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .left h1 {
+    font-size: 5xl; /* Smaller heading */
+  }
+
+  .left h2 {
+    font-size: 1.5rem;
+  }
+
+  .bgContainer {
+    width: 100%;
+    height: 60%;
+  }
+
+  .terms {
+    display: none; 
+  }
+  
+}
+
+@media screen and (max-width: 768px) {
+  .homepage {
+    padding: 0 12px;
+  }
+
+  .left h1 {
+    font-size: 4xl; /* Adjust heading size for smaller screens */
+  }
+
+  .left h2 {
+    font-size: 1.25rem;
+  }
+
+  .right {
+    width: 80%; 
+    height: auto;
+  }
+  .imgContainer{
+    width:90%;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .homepage {
+    padding: 0 8px;
+    gap: 8px;
+  }
+
+  .left h1 {
+    font-size: 3xl; /* Smaller heading for mobile */
+  }
+
+  .left h2 {
+    font-size: 1rem;
+  }
+
+  .right .imgContainer {
+    width: 100%;
+  }
+
+  .chat,
+  .terms {
+    display: none;
   }
 }
