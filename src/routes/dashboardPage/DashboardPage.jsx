@@ -10,15 +10,15 @@ const DashboardPage = () => {
       <div className="texts flex-1 flex flex-col items-center justify-center w-3/6 gap-14">
         <div className="logo flex items-center gap-2 opacity-25">
           <img
-            src={theme === "dark" ? "/logo-light.png" : "/logo-dark.png"}
+            src='/panda.svg'
             alt="Logo"
-            className="bg-white rounded-full w-14 h-14 p-2"
+            className="w-16 h-16"
           />
           <h1
             className="text-6xl font-bold bg-clip-text text-transparent
                      bg-gradient-to-r from-indigo-500 to-fuchsia-500"
           >
-            DEEPMIND
+            PANDA AI
           </h1>
         </div>
         <div className="options w-full flex items-center justify-between gap-16">
@@ -39,7 +39,7 @@ const DashboardPage = () => {
       </div>
       <div className="formContainer mt-auto">
         <form>
-          <input type="text" placeholder="Message DeepMind" />
+          <input type="text" placeholder="Ask Anything . . ." />
           <button>
             <img src="/arrow.png" alt="arrow image" />
           </button>

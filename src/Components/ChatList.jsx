@@ -24,13 +24,13 @@ const ChatList = () => {
           
             <div className="upgrade -mb-16 mt-auto flex items-center gap-2 text-xs ">
                 <img
-                    src={theme === 'light' ? '/logo-dark.png' : '/logo-light.png'}
+                    src='/panda.svg'
                     alt=""
-                    className="rounded-full w-6 h-6 p-1 bg-white mb-8"
+                    className="w-6 h-6 mb-8"
                 />
                 <div className="texts flex flex-col gap-1">
-                    <span className="font-semibold">Upgrade to DeepMind Pro</span>
-                    <span className="text-slate-300">Get unlimited access to all features</span>
+                    <span className="font-semibold">Upgrade to PANDA AI Pro</span>
+                    <span className="text-slate-500">Get unlimited access to all features</span>
                 </div>
             </div>
         </div>

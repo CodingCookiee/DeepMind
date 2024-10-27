@@ -23,7 +23,7 @@ const Homepage = () => {
       />
       <div className="left flex-1 flex flex-col items-center justify-center gap-4 text-center relative z-10">
         <h1 className="text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-fuchsia-500">
-          Deep Mind
+          PANDA AI
         </h1>
         <h2 className="font-bold">
           Creativity and Productivity at Your Fingertips
@@ -89,8 +89,8 @@ const Homepage = () => {
       </div>
       <div className='terms absolute bottom-20 left-2/4	-translate-x-2/4
       flex flex-col items-center gap-1'>
-        <img src={theme === 'light' ? '/logo-dark.png': '/logo-light.png'} alt="" className="bg-white rounded-full p-1	 w-7 h-7"/>
-        <div className={`links flex gap-1 ${termsColor}`}>
+        <img src='/panda.svg' alt="" className="w-7 h-7 ml-2"/>
+        <div className={`links flex gap-2 ${termsColor}`}>
             <Link to='/' className="font-extralight text-xs	">Terms of Service</Link>
             <span></span>
             <Link to='/' className="font-extralight text-xs	">Privacy Policy</Link>
