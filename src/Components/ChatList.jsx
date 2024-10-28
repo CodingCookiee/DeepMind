@@ -6,6 +6,7 @@ import ThemeContext from '../ThemeContext';
 const ChatList = () => {
     const { theme } = useContext(ThemeContext);
     const hoverBg = theme === 'light' ? 'hover:bg-slate-200' : 'hover:bg-neutral-800';
+    const scrollbarClass = theme === 'dark' ? 'scrollbar-dark' : 'scrollbar-light';
 
     return (
         <div className="chatList flex flex-col p-5 h-5/6">
@@ -13,7 +14,7 @@ const ChatList = () => {
             <hr className="border-none h-0.5 bg-slate-50 opacity-10 rounded-sm mb-5" />
 
             <span className="title font-semibold text-xs mb-2.5">RECENT CHATS</span>
-            <div className="list flex flex-col overflow-y-auto flex-grow h-full">
+            <div className={`list flex flex-col overflow-y-auto flex-grow h-full ${scrollbarClass}`}>
                 {Array.from({ length: 20 }).map((_, idx) => (
                     <Link key={idx} to="/" className={`p-2.5 rounded-xl ${hoverBg}`}>
                         Chat Title {idx + 1}

@@ -8,14 +8,14 @@
   --text-color: rgb(10, 10, 13);
   --button-bg-color: #f9f9f9;
   --button-text-color: #000;
-  overflow-y: scroll;
+   overflow-y: scroll;
+   overflow-x: hidden;
 }
 
 body {
   font-family: Poppins, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  overflow-x: hidden;
   background-color: var(--background-color);
   color: var(--text-color);
   font-synthesis: none;

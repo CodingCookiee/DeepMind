@@ -4,7 +4,15 @@ import ThemeContext from "../../ThemeContext";
 
 const DashboardPage = () => {
   const { theme } = useContext(ThemeContext);
-  
+
+  const formContainerClasses = theme === 'dark' ? 'bg-neutral-700' : 'bg-white';
+  const placeholderClasses = theme === 'dark' 
+    ? 'bg-neutral-800 text-white placeholder-gray-400' 
+    : 'bg-slate-200 text-black placeholder-gray-600';
+  const buttonClasses = theme === 'dark' 
+    ? 'bg-neutral-800 text-white hover:bg-neutral-600' 
+    : 'bg-slate-200 text-black hover:bg-slate-300';
+
   return (
     <div className="dashboardPage h-full flex flex-col items-center">
       <div className="texts flex-1 flex flex-col items-center justify-center w-3/6 gap-14">
@@ -21,27 +29,30 @@ const DashboardPage = () => {
             PANDA AI
           </h1>
         </div>
-        <div className="options w-full flex items-center justify-between gap-16">
-          {/* Set a fixed height and ensure equal flex properties */}
-          <div className="option flex flex-col gap-2.5 font-light text-sm p-5 border border-solid border-slate-400 rounded-2xl h-52 flex-1">
-            <img src="/chat.png" alt="Create a New Chat" />
+        <div className="options w-full flex items-center justify-between gap-14">
+          <div className="option flex flex-col gap-2.5 font-light text-sm p-5 border border-solid border-slate-400 rounded-2xl flex-1 shadow-md">
+            <img src="/chat.png" alt="Create a New Chat" className="w-10 h-10 object-cover" />
             <span>Create a New Chat</span>
           </div>
-          <div className="option flex flex-col gap-2.5 font-light text-sm p-5 border border-solid border-slate-400 rounded-2xl h-52 flex-1">
-            <img src="/code.png" alt="Help me with my Code" />
-            <span>Help me with my Code</span>
+          <div className="option flex flex-col gap-2.5 font-light text-sm p-5 border border-solid border-slate-400 rounded-2xl flex-1 shadow-md">
+            <img src="/code.png" alt="Help with Code" className="w-10 h-10 object-cover" />
+            <span>Help with Code</span>
           </div>
-          <div className="option flex flex-col gap-2.5 font-light text-sm p-5 border border-solid border-slate-400 rounded-2xl h-52 flex-1">
-            <img src="/image.png" alt="Analyze Images" />
-            <span>Analyze Images</span>
+          <div className="option flex flex-col gap-2.5 font-light text-sm p-5 border border-solid border-slate-400 rounded-2xl flex-1 shadow-md">
+            <img src="/image.png" alt="Analyze Images" className="w-10 h-10 object-cover"/>
+            <span>Analyze Data</span>
           </div>
         </div>
       </div>
-      <div className="formContainer mt-auto">
-        <form>
-          <input type="text" placeholder="Ask Anything . . ." />
-          <button>
-            <img src="/arrow.png" alt="arrow image" />
+      <div className={`formContainer mt-auto w-full max-w-2xl px-4 py-2 rounded-full flex items-center shadow-lg mb-20 ${formContainerClasses}`}>
+        <form className="flex items-center justify-between w-full gap-3">
+          <input 
+            type="text" 
+            placeholder="Ask me Anything ..." 
+            className={`flex-grow p-3 rounded-full focus:outline-none ${placeholderClasses}`}
+          />
+          <button className={`p-2 rounded-full flex items-center justify-center transition-colors ${buttonClasses}`}>
+            <img src="/arrow.png" alt="Submit" className="w-6 h-6"/>
           </button>
         </form>
       </div>
