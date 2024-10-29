@@ -3,7 +3,7 @@ import "./newPrompt.css";
 import React, { useContext, useRef, useEffect, useState } from "react";
 import ThemeContext from "../../ThemeContext";
 import { IKContext, IKImage, IKUpload } from "imagekitio-react";
-import Upload from "../upload/Upload";
+import Upload from "../upload/uploadData";
 
 const NewPrompt = () => {
   const [img, setImg] = useState({
@@ -24,11 +24,14 @@ const NewPrompt = () => {
   const newFormClasses = theme === "dark" ? "bg-neutral-700" : "bg-white";
   const endRef = useRef(null);
 
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   useEffect(() => {
     if (endRef.current) {
       endRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, []);
+  }, [img.isLoading, imageLoaded]);
+  
   return (
     <>
       {img.isLoading && (
@@ -53,22 +56,13 @@ const NewPrompt = () => {
           },
         ]}
         className="mt-4"
+        onLoad={() => setImageLoaded(prev => !prev)}
       />
       <div className="endChat p-10" ref={endRef}></div>
       <form
         className={`newForm flex items-center w-6/12 gap-3 max-w-2xl 
                 px-4 py-2 rounded-full absolute -bottom-2 ${newFormClasses}`}
       >
-        {/* <label
-          htmlFor="file"
-          className="border-none rounded-3xl p-1 flex items-center justify-center cursor-pointer"
-        >
-          <img
-            src={theme === "light" ? "/attach-dark.png" : "/attach-light.png"}
-            alt=""
-            className="w-6 h-6"
-          />
-        </label> */}
         <Upload setImg={setImg} />
         <input id="file" type="file" multiple={false} hidden />
         <input

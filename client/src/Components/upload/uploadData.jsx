@@ -1,5 +1,7 @@
 import { IKContext, IKUpload } from 'imagekitio-react';
 import PropTypes from 'prop-types'
+import ThemeContext from '../../ThemeContext';
+import { useContext, useRef } from 'react';
 
 const urlEndpoint = import.meta.env.VITE_IMAGE_KIT_ENDPOINT;
 const publicKey = import.meta.env.VITE_IMAGE_KIT_PUBLIC_KEY; 
@@ -20,6 +22,10 @@ const authenticator = async () => {
 };
 
 const Upload = ({ setImg }) => {
+    const { theme } = useContext(ThemeContext);
+
+    const ikUploadRef = useRef(null)
+
   const onError = err => {
       console.log("Error", err);
   };
@@ -52,7 +58,21 @@ const Upload = ({ setImg }) => {
               useUniqueFileName={true}
               onUploadProgress={onUploadProgress}
               onUploadStart={onUploadStart}
+              style={{display: 'none'}}
+              ref={ikUploadRef}
           />
+           <label
+          className="border-none rounded-3xl p-1 flex 
+          items-center justify-center cursor-pointer"
+          onClick={()=> ikUploadRef.current.click()}
+        >
+          <img
+            src={theme === "light" ? "/attach-dark.png" : "/attach-light.png"}
+            alt=""
+            className="w-6 h-6"
+          />
+        </label>
+
       </IKContext>
   );
 };
