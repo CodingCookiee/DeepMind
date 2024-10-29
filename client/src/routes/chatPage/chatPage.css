@@ -1,3 +1,12 @@
+.chat{
+
+    p, li{
+        margin: 10px 0px
+    }
+}
+
+
+
 a/* Light Theme Scrollbar */
 .scrollbar-light::-webkit-scrollbar {
     width: 6px;
