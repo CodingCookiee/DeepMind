@@ -2,6 +2,9 @@ import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
 import ImageKit from 'imagekit'
+import mongoose from 'mongoose'
+import UserChats from './models/userChats.js' 
+import Chat from './models/chat.js'
 
 dotenv.config()
 
@@ -10,7 +13,18 @@ const port = parseInt(process.env.PORT || '8000', 10)
 
 app.use(cors({
     origin: process.env.CLIENT_URL,
-}))
+}));
+
+app.use(express.json())
+
+const connect = async ()=>{
+    try {
+       await mongoose.connect(process.env.MONGO_DB);  
+       console.log('Successfully Connected to MongDB')
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 const imagekitInstance = new ImageKit({
     urlEndpoint: process.env.IMAGE_KIT_ENDPOINT,
@@ -23,7 +37,55 @@ app.get('/api/upload', (req, res) => {
     res.send(result);
 })
 
+app.post('/api/chats', async (req, res) => {
+    const { userId, text } = req.body
+
+    try {
+        // Create a new Chat
+        const newChat = new Chat({
+            userId:userId,
+            history: [{role:'user', parts:[{text}]}]
+        });
+        const savedChat = await newChat.save();
+
+        // Check if any user chat exists
+        const UserChats = await UserChats.find({userId: userId})
+
+        //if chat does not exists: Create a new chat and add it in the chats array
+        if(!UserChats.length){
+            const newUserChats = new UserChats({
+                userId:userId,
+                chats:[
+                    {
+                        _id:savedChat._id,
+                        title:text.substring(0, 40),
+                    },
+                ],
+            });
+            
+            await newUserChats.save();
+
+        }else{
+            // if chat does exit : push the chat to the existing array
+            await UserChats.updateOne({userId:userId},{
+                $push:{
+                    chats:{
+                        _id:savedChat._id,
+                        title: text.substring(0, 40)
+                    },
+                },
+            });
+
+            res.status(201).send(newChat._id)
+        }
+
+    } catch (error) {
+        res.status(500).send('Internal Server Error')
+    }
+})
+
 app.listen(port, 'localhost', () => {
+    connect()
     console.log(`Server running successfully on http://localhost:${port}`)
 }).on('error', (err) => {
     if (err.code === 'EACCES') {

@@ -1,8 +1,25 @@
 import "./dashboardPage.css";
 import React, { useContext } from "react";
 import ThemeContext from "../../ThemeContext";
+import { useAuth } from '@clerk/clerk-react'
 
 const DashboardPage = () => {
+
+  const { userId } = useAuth()
+  const handleSubmit = async (e) =>{
+    e.preventDefault();
+    const text = e.target.text.value;
+    if(!text) return;
+
+    await fetch('http://localhost:8000/api/chats', {
+      method: 'POST',
+      headers:{
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ userId, text }) 
+    })
+  }
+
   const { theme } = useContext(ThemeContext);
 
   const formContainerClasses = theme === 'dark' ? 'bg-neutral-700' : 'bg-white';
@@ -45,8 +62,11 @@ const DashboardPage = () => {
         </div>
       </div>
       <div className={`formContainer mt-auto w-full max-w-2xl px-4 py-2 rounded-full flex items-center shadow-lg mb-20 ${formContainerClasses}`}>
-        <form className="flex items-center justify-between w-full gap-3">
+        <form className="flex items-center 
+        justify-between w-full gap-3"
+        onSubmit={handleSubmit}>
           <input 
+            name ='text'
             type="text" 
             placeholder="Ask me Anything ..." 
             className={`flex-grow p-3 rounded-full focus:outline-none ${placeholderClasses}`}
