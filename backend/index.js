@@ -43,44 +43,48 @@ app.post('/api/chats', async (req, res) => {
     try {
         // Create a new Chat
         const newChat = new Chat({
-            userId:userId,
-            history: [{role:'user', parts:[{text}]}]
+            userId: userId,
+            history: [{role: 'user', parts:[{text}]}]
         });
         const savedChat = await newChat.save();
 
-        // Check if any user chat exists
-        const UserChats = await UserChats.find({userId: userId})
+        // Check if any user chat exists - Fixed the model reference
+        const userChats = await UserChats.findOne({userId: userId});
 
         //if chat does not exists: Create a new chat and add it in the chats array
-        if(!UserChats.length){
+        if(!userChats){
             const newUserChats = new UserChats({
-                userId:userId,
-                chats:[
+                userId: userId,
+                chats: [
                     {
-                        _id:savedChat._id,
-                        title:text.substring(0, 40),
+                        _id: savedChat._id,
+                        title: text.substring(0, 40),
                     },
                 ],
             });
             
             await newUserChats.save();
+            res.status(201).json({chatId: savedChat._id});
 
-        }else{
-            // if chat does exit : push the chat to the existing array
-            await UserChats.updateOne({userId:userId},{
-                $push:{
-                    chats:{
-                        _id:savedChat._id,
-                        title: text.substring(0, 40)
+        } else {
+            // if chat exists: push the chat to the existing array
+            await UserChats.updateOne(
+                {userId: userId},
+                {
+                    $push: {
+                        chats: {
+                            _id: savedChat._id,
+                            title: text.substring(0, 40)
+                        },
                     },
-                },
-            });
+                }
+            );
 
-            res.status(201).send(newChat._id)
+            res.status(201).json({chatId: savedChat._id});
         }
 
     } catch (error) {
-        res.status(500).send('Internal Server Error')
+        res.status(500).json({error: 'Internal Server Error'});
     }
 })
 
