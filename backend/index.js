@@ -96,14 +96,18 @@ app.post("/api/chats", requireAuth(), async (req, res) => {
 
 
 app.get('/api/userChats', requireAuth(), async (req, res) => {
-  const userId = req.auth.userId;
-  try {
-    const userChats = await UserChats.find({ userId });
-    res.status(200).json(userChats);
-  } catch (error) {
-    res.status(500).json({ error: "Error Fetching User Chats" });;
-  }
-});
+    const userId = req.auth.userId;
+    try {
+      const userChats = await UserChats.findOne({ userId });
+      if (!userChats) {
+        return res.status(404).json({ error: "User Chats not found" });
+      }
+      res.status(200).json(userChats.chats); // Corrected to return chats array
+    } catch (error) {
+      res.status(500).json({ error: "Error Fetching User Chats" });
+    }
+  });
+  
 
 
 app
