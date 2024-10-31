@@ -2,23 +2,42 @@ import "./dashboardPage.css";
 import React, { useContext } from "react";
 import ThemeContext from "../../ThemeContext";
 import { useAuth } from '@clerk/clerk-react'
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 const DashboardPage = () => {
 
-  const { userId } = useAuth()
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+    
+  // Mutations
+    const mutation = useMutation({
+      mutationFn: (text) => {
+        return fetch(`${import.meta.env.VITE_API_URL}/api/chats`, {
+          method: 'POST',
+          credentials: 'include',
+          headers:{
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ text })
+        }).then(res => {
+          if (!res.ok) throw new Error('Network response was not ok');
+          return res.json(); // Ensure you return the JSON response
+        });
+      },
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: ['userChats'] });
+        navigate(`/dashboard/chats/${data.chatId}`);
+      }, onError: (error) => {
+      console.error('Error:', error);
+    },
+    })
+
   const handleSubmit = async (e) =>{
     e.preventDefault();
     const text = e.target.text.value;
     if(!text) return;
-
-    await fetch('http://localhost:8000/api/chats', {
-      method: 'POST',
-      credentials: 'include',
-      headers:{
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ text }) 
-    })
+    mutation.mutate(text);
   }
 
   const { theme } = useContext(ThemeContext);
@@ -32,7 +51,7 @@ const DashboardPage = () => {
     : 'bg-slate-200 text-black hover:bg-slate-300';
 
   return (
-    <div className="dashboardPage h-full flex flex-col items-center">
+    <div className="dashboardPage h-full flex flex-col items-center overflow-hidden ">
       <div className="texts flex-1 flex flex-col items-center justify-center w-3/6 gap-14">
         <div className="logo flex items-center gap-2 opacity-25">
           <img
@@ -81,5 +100,4 @@ const DashboardPage = () => {
     </div>
   );
 };
-
 export default DashboardPage;

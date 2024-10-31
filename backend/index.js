@@ -4,9 +4,10 @@ import cors from "cors";
 import ImageKit from "imagekit";
 import mongoose from "mongoose";
 import { clerkMiddleware, requireAuth } from "@clerk/express";
-import OpenAI from 'openai';
 import UserChats from "./models/userChats.js";
+import  { GoogleGenerativeAI } from "@google/generative-ai";
 import Chat from "./models/chat.js";
+
 
 dotenv.config();
 
@@ -44,26 +45,23 @@ app.get("/api/upload", (req, res) => {
   res.send(result);
 });
 
-// Initialize OpenAI with the API key from environment variables
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize Gemini with the API key from environment variables
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_PUBLIC_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-// Function to generate a dynamic chat title
+// Generate chat title using Google Gemini
+// Generate chat title using Google Gemini
 const generateChatTitle = async (text) => {
   try {
-    // Request a completion from OpenAI's GPT-3.5-turbo model
-    const response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "Generate a short, descriptive title for the following message." },
-        { role: "user", content: text },
-      ],
-      max_tokens: 10,  // Limit response length to a short title
-      temperature: 0.7, // Control creativity
-    });
-    // Extract and return the title
-    const title = response.data.choices[0].message.content.trim();
+    // Use the Google Gemini model instance to generate a response
+    const result = await model.generateContent(`Provide a one sentence, single-line, maximum five words, concise 
+      and title that captures the main idea of the following message: "${text}".
+      Please provide only plain text without any markdown or symbols at the start.`);
+
+    // Extract and clean the title from the response
+    const title = result.response?.text ? result.response.text().trim().replace(/^#+\s*/, '') : null; // Use optional chaining
+
+
     return title || "Untitled Chat";
   } catch (error) {
     console.error("Error generating chat title:", error);
@@ -72,20 +70,30 @@ const generateChatTitle = async (text) => {
 };
 
 
+
+
 // Endpoint to create a new chat
 app.post("/api/chats", requireAuth(), async (req, res) => {
   const userId = req.auth.userId;
   const { text } = req.body;
 
   try {
-    // Generate title based on the initial message
-    const chatTitle = await generateChatTitle(text);
-    // Create a new Chat
+    // Create a new Chat with a default title
     const newChat = new Chat({
       userId: userId,
+      title: "New Chat", // Initial title
       history: [{ role: "user", parts: [{ text }] }],
     });
     const savedChat = await newChat.save();
+
+    // Send response immediately with chat ID
+    res.status(201).json({ chatId: savedChat._id });
+
+    // Generate title based on the initial message asynchronously
+    const chatTitle = await generateChatTitle(text);
+
+    // Update the chat with the generated title
+    await Chat.findByIdAndUpdate(savedChat._id, { title: chatTitle });
 
     // Check if user already has chat history
     const userChat = await UserChats.findOne({ userId: userId });
@@ -94,34 +102,22 @@ app.post("/api/chats", requireAuth(), async (req, res) => {
       // If no previous chats, create a new UserChats document
       const newUserChats = new UserChats({
         userId: userId,
-        chats: [
-          {
-            _id: savedChat._id,
-            title: chatTitle,
-          },
-        ],
+        chats: [{ _id: savedChat._id, title: chatTitle }],
       });
       await newUserChats.save();
-      res.status(201).json({ chatId: savedChat._id });
     } else {
       // If chats exist, push new chat into chats array
       await UserChats.findOneAndUpdate(
         { userId: userId },
-        {
-          $push: {
-            chats: {
-              _id: savedChat._id,
-              title: chatTitle,
-            },
-          },
-        }
+        { $push: { chats: { _id: savedChat._id, title: chatTitle } } }
       );
-      res.status(201).json({ chatId: savedChat._id });
     }
   } catch (error) {
-    res.status(500).json({ error: "Error creating chat" });
+    res.status(500).json({ error: "Error creating new chat" });
   }
 });
+
+
 
 // Endpoint to fetch user chats
 app.get("/api/userChats", requireAuth(), async (req, res) => {
@@ -136,6 +132,23 @@ app.get("/api/userChats", requireAuth(), async (req, res) => {
     res.status(500).json({ error: "Error Fetching User Chats" });
   }
 });
+
+
+// Endpoint to fetch a specific chat
+app.get("/api/chats/:id", requireAuth(), async (req, res) => {
+  const userId = req.auth.userId;
+  try {
+    const chat = await Chat.findOne({ _id: req.params.id, userId }); // Fix here
+    if (!chat) {
+      return res.status(404).json({ error: "Chat not found" });
+    }
+    res.status(200).json(chat);
+  } catch (error) {
+    console.error("Error fetching chat:", error); 
+    res.status(500).json({ error: "Error Fetching Chat" });
+  }
+});
+
 
 app
   .listen(port, "localhost", () => {

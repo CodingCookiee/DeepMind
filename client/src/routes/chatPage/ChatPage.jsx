@@ -3,17 +3,29 @@ import "./chatPage.css";
 import React, { useContext } from "react";
 import ThemeContext from "../../ThemeContext";
 import NewPrompt from "../../Components/newPrompt/newPrompt";
+import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
+import Markdown from "react-markdown";
+import { IKImage } from "imagekitio-react";
 
-const ChatPage = ({ messageCount = 40 }) => {
-  const demoMessages = Array.from({ length: messageCount }, (_, index) => ({
-    sender: index % 2 === 0 ? "ai" : "user",
-    text: `Test Message ${index + 1} from ${index % 2 === 0 ? "AI" : "User"}`,
-  }));
+const ChatPage = () => {
+  const pathname = useLocation().pathname;
+  const chatId = pathname.split("/").pop();
+
+  const { isPending, error, data } = useQuery({
+    queryKey: ["chat", chatId],
+    queryFn: () =>
+      fetch(`${import.meta.env.VITE_API_URL}/api/chats/${chatId}`, {
+        credentials: "include",
+      }).then((res) => res.json()),
+  });
+
 
   const { theme } = useContext(ThemeContext);
   const userBg = theme === "light" ? "bg-slate-300" : "bg-neutral-700";
   const scrollbarClass =
     theme === "dark" ? "scrollbar-dark" : "scrollbar-light";
+  const loadingBg = theme === "light" ? "bg-slate-300" : "bg-slate-700";
 
   return (
     <div className="chatPage h-full flex flex-col items-center relative">
@@ -21,23 +33,47 @@ const ChatPage = ({ messageCount = 40 }) => {
         className={`wrapper flex-1 overflow-y-auto w-full flex justify-center ${scrollbarClass}`}
       >
         <div className="chat w-6/12 flex flex-col">
-          {demoMessages.map((msg, index) => (
-            <div
-              key={index}
-              className={`message p-5 ${
-                msg.sender === "user"
-                  ? `${userBg} rounded-3xl max-w-[90%] self-end ml-auto`
-                  : ""
-              }`}
-            >
-              {msg.text}
-            </div>
-          ))}
+          {isPending ? (
+              <div>Processing...</div>
+          ) : error ? (
+            <div>Something went wrong</div>
+          ) : (
+            data?.history?.map((message, i) => (
+              <React.Fragment key={i}>
+              {
+                message.img && (
+                  <IKImage
+                    urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
+                    path={message.img}
+                    loading="lazy"
+                    alt="image"
+                    width="400"
+                    height="300"
+                    transformation={[
+                      {
+                        height: "300",
+                        width: "400",
+                        crop: "scale",
+                      },
+                    ]}
+                    lqip={{active: true, quality: 30}}
+                  />
+                )
+              }
+              <div
+                className={`message ${
+                  message.role === "user" ? "user message p-5 rounded-3xl max-w-[90%] self-end ml-auto" : "message p-5"
+                }`}
+              >
+                <Markdown>{message.parts[0].text}</Markdown>
+              </div>
+              </React.Fragment>
+            ))
+          )}
           <NewPrompt />
         </div>
       </div>
     </div>
   );
 };
-
 export default ChatPage;
