@@ -3,27 +3,27 @@ import mongoose from "mongoose";
 const userChatsSchema = new mongoose.Schema({
     userId: {
         type: String,
-        required:true,
+        required: true,
     },
-    //  User Chats
-    chats : [
+    chats: [
         {
-            _id:{
+            _id: {
                 type: String,
                 required: true,
             },
-            title:{
+            title: {
                 type: String,
                 required: true,
+                default: "Untitled Chat",  // Fallback title if none is provided
             },
-            createdAt:{
+            createdAt: {
                 type: Date,
-                default:Date.now(),
+                default: Date.now,
             },
         },
     ],
-},{
-    timestamps:true
+}, {
+    timestamps: true,
 });
 
-export default mongoose.models.UserChats || mongoose.model('UserChats', userChatsSchema )
+export default mongoose.models.UserChats || mongoose.model("UserChats", userChatsSchema);
