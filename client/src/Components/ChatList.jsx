@@ -21,14 +21,14 @@ const ChatList = () => {
 
   return (
     <div className="chatList flex flex-col p-5 h-5/6">
-      <span className="title font-semibold text-xs mb-2.5">DASHBOARD</span>
-      <Link to="/dashboard" className="font-normal text-sm mb-2.5">
+    <span className="title font-semibold text-xs mb-2.5 ">DASHBOARD</span>
+      <Link to="/dashboard" className="font-normal text-base mb-2.5">
         Create a new Chat
       </Link>
-      <Link to="/" className="font-normal text-sm mb-2.5">
+      <Link to="/" className="font-normal text-base mb-2.5">
         Explore Lama AI
       </Link>
-      <Link to="/" className="font-normal text-sm mb-2.5">
+      <Link to="/" className="font-normal text-base mb-2.5">
         Contact
       </Link>
       <hr className="border-none h-0.5 bg-slate-50 opacity-10 rounded-sm mb-5" />

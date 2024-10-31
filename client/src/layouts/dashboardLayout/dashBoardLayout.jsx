@@ -37,7 +37,7 @@ const DashBoardLayout = () => {
     );
 
     return (
-        <div className="dashboardLayout flex gap-3 pt-5 h-screen">
+        <div className="dashboardLayout flex gap-3 pt-5 h-full">
             <div className="menu flex-none w-56">
                 <ChatList />
             </div>

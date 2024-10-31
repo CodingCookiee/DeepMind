@@ -62,9 +62,10 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
-      <div className={`formContainer mt-auto w-full max-w-2xl px-4 py-2 rounded-full flex items-center shadow-lg mb-20 ${formContainerClasses}`}>
-        <form className="flex items-center 
-        justify-between w-full gap-3"
+      <div className={`formContainer flex items-center mt-auto w-full
+      max-w-2xl px-4 py-2.5 rounded-full shadow-lg ${formContainerClasses}`}>
+        <form className="flex items-center
+        justify-between w-full gap-3 "
         onSubmit={handleSubmit}>
           <input 
             name ='text'
