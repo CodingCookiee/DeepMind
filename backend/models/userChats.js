@@ -14,7 +14,7 @@ const userChatsSchema = new mongoose.Schema({
             title: {
                 type: String,
                 required: true,
-                default: "Untitled Chat",  // Fallback title if none is provided
+                default: "Untitled Chat",  
             },
             createdAt: {
                 type: Date,

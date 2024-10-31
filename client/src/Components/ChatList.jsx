@@ -14,9 +14,11 @@ const ChatList = () => {
   });
 
   const { theme } = useContext(ThemeContext);
-  const hoverBg = theme === "light" ? "hover:bg-slate-200" : "hover:bg-neutral-800";
+  const hoverBg =
+    theme === "light" ? "hover:bg-slate-200" : "hover:bg-neutral-800";
   const loadingBg = theme === "light" ? "bg-slate-300" : "bg-slate-700";
-  const scrollbarClass = theme === "dark" ? "scrollbar-dark" : "scrollbar-light";
+  const scrollbarClass =
+    theme === "dark" ? "scrollbar-dark" : "scrollbar-light";
 
   return (
     <div className="chatList flex flex-col p-5 h-5/6">
@@ -33,27 +35,29 @@ const ChatList = () => {
       <hr className="border-none h-0.5 bg-slate-50 opacity-10 rounded-sm mb-5" />
 
       <span className="title font-semibold text-xs mb-2.5">RECENT CHATS</span>
-      <div className={`list flex flex-col overflow-y-auto flex-grow h-full ${scrollbarClass}`}>
+      <div
+        className={`list flex flex-col overflow-y-auto flex-grow h-full ${scrollbarClass}`}
+      >
         {isPending ? (
-          <div className={`border ${theme === "light" ? "border-gray-300" : "border-gray-700"} shadow rounded-md p-4 max-w-sm w-full mx-auto`}>
+          <div
+            className={`border ${theme === "light" ? "border-gray-300" : "border-gray-700"} shadow rounded-md p-4 max-w-sm w-full mx-auto`}
+          >
             <div className="animate-pulse flex space-x-4">
               <div className={`rounded-full ${loadingBg} h-10 w-10`}></div>
               <div className="flex-1 space-y-6 py-1">
                 <div className={`h-2 ${loadingBg} rounded`}></div>
                 <div className="space-y-3">
                   <div className="grid grid-cols-3 gap-4">
-                    <div className={`h-2 ${loadingBg} rounded col-span-2`}></div>
-                    <div className={`h-2 ${loadingBg} rounded col-span-1`}></div>
-                    <div className={`h-2 ${loadingBg} rounded col-span-2`}></div>
-                    <div className={`h-2 ${loadingBg} rounded col-span-1`}></div>
-                    <div className={`h-2 ${loadingBg} rounded col-span-2`}></div>
-                    <div className={`h-2 ${loadingBg} rounded col-span-1`}></div>
-                    <div className={`h-2 ${loadingBg} rounded col-span-2`}></div>
-                    <div className={`h-2 ${loadingBg} rounded col-span-1`}></div>
-                    <div className={`h-2 ${loadingBg} rounded col-span-2`}></div>
-                    <div className={`h-2 ${loadingBg} rounded col-span-1`}></div>
-                    <div className={`h-2 ${loadingBg} rounded col-span-2`}></div>
-                    <div className={`h-2 ${loadingBg} rounded col-span-1`}></div>
+                    {[...Array(8)].map((_, i) => (
+                      <div key={i} className="space-y-3">
+                        <div
+                          className={`h-2 ${loadingBg} rounded col-span-2`}
+                        ></div>
+                        <div
+                          className={`h-2 ${loadingBg} rounded col-span-1`}
+                        ></div>
+                      </div>
+                    ))}
                   </div>
                   <div className={`h-2 ${loadingBg} rounded`}></div>
                 </div>
@@ -71,7 +75,8 @@ const ChatList = () => {
             >
               <div className="texts flex flex-col gap-1">
                 <span className="font-semibold">
-                  {chat.title || "Untitled Chat"}  {/* Display fallback if title is missing */}
+                  {chat.title || "Untitled Chat"}{" "}
+                  {/* Display fallback if title is missing */}
                 </span>
               </div>
             </Link>
@@ -86,7 +91,9 @@ const ChatList = () => {
         <img src="/panda.svg" alt="" className="w-6 h-6 mb-8" />
         <div className="texts flex flex-col gap-1">
           <span className="font-semibold">Upgrade to PANDA AI Pro</span>
-          <span className="text-slate-500">Get unlimited access to all features</span>
+          <span className="text-slate-500">
+            Get unlimited access to all features
+          </span>
         </div>
       </div>
     </div>

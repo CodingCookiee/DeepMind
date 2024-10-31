@@ -4,7 +4,7 @@ import cors from "cors";
 import ImageKit from "imagekit";
 import mongoose from "mongoose";
 import { clerkMiddleware, requireAuth } from "@clerk/express";
-import { Configuration, OpenAIApi } from "openai";
+import OpenAI from 'openai';
 import UserChats from "./models/userChats.js";
 import Chat from "./models/chat.js";
 
@@ -44,12 +44,10 @@ app.get("/api/upload", (req, res) => {
   res.send(result);
 });
 
-import { Configuration, OpenAIApi } from "openai";
-
 // Initialize OpenAI with the API key from environment variables
-const openai = new OpenAIApi(new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-}));
+});
 
 // Function to generate a dynamic chat title
 const generateChatTitle = async (text) => {
