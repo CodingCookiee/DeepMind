@@ -118,7 +118,7 @@ const NewPrompt = () => {
           <Markdown>{answer}</Markdown>
         </div>
       )}
-      <div className="endChat p-10" ref={endRef}></div>
+      <div className="endChat p-6" ref={endRef}></div>
       <form
         className={`newForm flex items-center w-6/12 gap-3 max-w-2xl 
         px-4 py-2 rounded-full absolute -bottom-2 ${newFormClasses}`}

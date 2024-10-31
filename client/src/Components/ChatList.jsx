@@ -79,7 +79,7 @@ const ChatList = () => {
       </div>
       <hr className="border-none h-0.5 bg-slate-50 opacity-10 rounded-sm mt-5 mb-5" />
 
-      <div className="upgrade -mb-16 mt-auto flex items-center gap-2 text-xs ">
+      <div className="upgrade -mb-20 mt-auto flex items-center gap-2 text-xs ">
         <img src="/panda.svg" alt="" className="w-6 h-6 mb-8" />
         <div className="texts flex flex-col gap-1">
           <span className="font-semibold">Upgrade to PANDA AI Pro</span>

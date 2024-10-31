@@ -27,7 +27,7 @@ const ChatPage = ({ messageCount = 40 }) => {
               className={`message p-5 ${
                 msg.sender === "user"
                   ? `${userBg} rounded-3xl max-w-[90%] self-end ml-auto`
-                  : "mt-10"
+                  : ""
               }`}
             >
               {msg.text}
