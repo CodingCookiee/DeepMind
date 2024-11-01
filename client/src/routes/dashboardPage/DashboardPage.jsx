@@ -22,7 +22,7 @@ const DashboardPage = () => {
           body: JSON.stringify({ text })
         }).then(res => {
           if (!res.ok) throw new Error('Network response was not ok');
-          return res.json(); // Ensure you return the JSON response
+          return res.json();
         });
       },
       onSuccess: (data) => {

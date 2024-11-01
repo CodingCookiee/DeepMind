@@ -5,9 +5,8 @@ import ImageKit from "imagekit";
 import mongoose from "mongoose";
 import { clerkMiddleware, requireAuth } from "@clerk/express";
 import UserChats from "./models/userChats.js";
-import  { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import Chat from "./models/chat.js";
-
 
 dotenv.config();
 
@@ -50,17 +49,14 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_PUBLIC_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // Generate chat title using Google Gemini
-// Generate chat title using Google Gemini
 const generateChatTitle = async (text) => {
   try {
-    // Use the Google Gemini model instance to generate a response
     const result = await model.generateContent(`Provide a one sentence, single-line, maximum five words, concise 
-      and title that captures the main idea of the following message: "${text}".
-      Please provide only plain text without any markdown or symbols at the start.`);
-
-    // Extract and clean the title from the response
-    const title = result.response?.text ? result.response.text().trim().replace(/^#+\s*/, '') : null; // Use optional chaining
-
+      and title that captures the main idea of the following message: "${text}". Please provide only plain text without any markdown or symbols at the start.`);
+    
+    const title = result.response?.text
+      ? result.response.text().trim().replace(/^#+\s*/, "")
+      : null;
 
     return title || "Untitled Chat";
   } catch (error) {
@@ -69,54 +65,60 @@ const generateChatTitle = async (text) => {
   }
 };
 
-
-
-
 // Endpoint to create a new chat
 app.post("/api/chats", requireAuth(), async (req, res) => {
   const userId = req.auth.userId;
   const { text } = req.body;
 
   try {
-    // Create a new Chat with a default title
+    // Save chat immediately with temporary "New Chat" title
     const newChat = new Chat({
-      userId: userId,
-      title: "New Chat", // Initial title
+      userId,
+      title: "New Chat",
       history: [{ role: "user", parts: [{ text }] }],
     });
     const savedChat = await newChat.save();
 
-    // Send response immediately with chat ID
-    res.status(201).json({ chatId: savedChat._id });
+    // Send initial response with new chat data
+    res.status(201).json({
+      chatId: savedChat._id,
+      title: "New Chat",
+    });
 
-    // Generate title based on the initial message asynchronously
+    // Generate the chat title asynchronously based on the initial message
     const chatTitle = await generateChatTitle(text);
 
-    // Update the chat with the generated title
+    // Update the chat title in Chat and UserChats collections independently
     await Chat.findByIdAndUpdate(savedChat._id, { title: chatTitle });
+    await UserChats.updateOne(
+      { userId },
+      { $addToSet: { chats: { _id: savedChat._id, title: chatTitle } } },
+      { upsert: true }
+    );
 
-    // Check if user already has chat history
-    const userChat = await UserChats.findOne({ userId: userId });
-
-    if (!userChat) {
-      // If no previous chats, create a new UserChats document
-      const newUserChats = new UserChats({
-        userId: userId,
-        chats: [{ _id: savedChat._id, title: chatTitle }],
-      });
-      await newUserChats.save();
-    } else {
-      // If chats exist, push new chat into chats array
-      await UserChats.findOneAndUpdate(
-        { userId: userId },
-        { $push: { chats: { _id: savedChat._id, title: chatTitle } } }
-      );
-    }
+    console.log(`Chat title updated to: ${chatTitle}`);
   } catch (error) {
+    console.error("Error creating chat:", error);
     res.status(500).json({ error: "Error creating new chat" });
   }
 });
+// New endpoint to fetch the latest chat title
+app.get("/api/chats/:id/title", requireAuth(), async (req, res) => {
+  const userId = req.auth.userId;
+  const chatId = req.params.id;
 
+  try {
+    const chat = await Chat.findOne({ _id: chatId, userId }, "title");
+    if (!chat) {
+      return res.status(404).json({ error: "Chat not found" });
+    }
+
+    res.status(200).json({ title: chat.title });
+  } catch (error) {
+    console.error("Error fetching chat title:", error);
+    res.status(500).json({ error: "Error Fetching Chat Title" });
+  }
+});
 
 
 // Endpoint to fetch user chats
@@ -133,34 +135,63 @@ app.get("/api/userChats", requireAuth(), async (req, res) => {
   }
 });
 
-
 // Endpoint to fetch a specific chat
 app.get("/api/chats/:id", requireAuth(), async (req, res) => {
   const userId = req.auth.userId;
   try {
-    const chat = await Chat.findOne({ _id: req.params.id, userId }); // Fix here
+    const chat = await Chat.findOne({ _id: req.params.id, userId });
     if (!chat) {
       return res.status(404).json({ error: "Chat not found" });
     }
     res.status(200).json(chat);
   } catch (error) {
-    console.error("Error fetching chat:", error); 
+    console.error("Error fetching chat:", error);
     res.status(500).json({ error: "Error Fetching Chat" });
   }
 });
 
+// Updating Existing Chat
+app.put("/api/chats/:id", requireAuth(), async (req, res) => {
+  const userId = req.auth.userId;
+  const { question, answer, img } = req.body;
 
-app
-  .listen(port, "localhost", () => {
-    connect();
-    console.log(`Server running successfully on http://localhost:${port}`);
-  })
-  .on("error", (err) => {
-    if (err.code === "EACCES") {
-      console.log(`Port ${port} requires elevated privileges. Try these solutions:
+  const newItems = [
+    ...(question ? [{ role: 'user', parts: [{ text: question }], ...(img && { img }) }] : []),
+    { role: 'model', parts: [{ text: answer }] },
+  ];
+
+  try {
+    const updateChat = await Chat.findOneAndUpdate(
+      { _id: req.params.id, userId },
+      {
+        $push: {
+          history: {
+            $each: newItems,
+          },
+        },
+      }
+    );
+    if (!updateChat) {
+      return res.status(404).json({ error: "Chat not found" });
+    }
+    res.status(200).json(updateChat);
+  } catch (error) {
+    console.error("Error updating chat:", error);
+    res.status(500).json({ error: "Error Updating Chat" });
+  }
+});
+
+
+
+app.listen(port, "localhost", () => {
+  connect();
+  console.log(`Server running successfully on http://localhost:${port}`);
+}).on("error", (err) => {
+  if (err.code === "EACCES") {
+    console.log(`Port ${port} requires elevated privileges. Try these solutions:
         1. Use a port number above 1024
         2. Run the command prompt as administrator`);
-    } else {
-      console.error("Server error:", err);
-    }
-  });
+  } else {
+    console.error("Server error:", err);
+  }
+});

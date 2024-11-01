@@ -1,10 +1,15 @@
 import "./chatList.css";
 import { Link } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import ThemeContext from "../ThemeContext";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query"; 
 
-const ChatList = () => {
+
+
+const ChatList = ({ chatId, chatTitle, setChatTitle }) => {
+
+  const queryClient = useQueryClient(); 
+
   const { isPending, error, data } = useQuery({
     queryKey: ["userChats"],
     queryFn: () =>
@@ -14,11 +19,19 @@ const ChatList = () => {
   });
 
   const { theme } = useContext(ThemeContext);
-  const hoverBg =
-    theme === "light" ? "hover:bg-slate-200" : "hover:bg-neutral-800";
+  const hoverBg = theme === "light" ? "hover:bg-slate-200" : "hover:bg-neutral-800";
   const loadingBg = theme === "light" ? "bg-slate-300" : "bg-slate-700";
-  const scrollbarClass =
-    theme === "dark" ? "scrollbar-dark" : "scrollbar-light";
+  const scrollbarClass = theme === "dark" ? "scrollbar-dark" : "scrollbar-light";
+
+ 
+   // Poll to check if any "New Chat" title has been updated
+   useEffect(() => {
+    const intervalId = setInterval(() => {
+      queryClient.invalidateQueries("userChats");
+    }, 3000); // Poll every 3 seconds
+
+    return () => clearInterval(intervalId);
+  }, [queryClient]);
 
   return (
     <div className="chatList flex flex-col p-5 h-5/6">
@@ -35,10 +48,8 @@ const ChatList = () => {
       <hr className="border-none h-0.5 bg-slate-50 opacity-10 rounded-sm mb-5" />
 
       <span className="title font-semibold text-xs mb-2.5">RECENT CHATS</span>
-      <div
-        className={`list flex flex-col overflow-y-auto flex-grow h-full ${scrollbarClass}`}
-      >
-        {isPending ? (
+      <div className={`list flex flex-col overflow-y-auto flex-grow h-full ${scrollbarClass}`}>
+        {isPending ?  (
           <div
             className={`border ${theme === "light" ? "border-gray-300" : "border-gray-700"} shadow rounded-md p-4 max-w-sm w-full mx-auto`}
           >
@@ -75,8 +86,7 @@ const ChatList = () => {
             >
               <div className="texts flex flex-col gap-1">
                 <span className="font-semibold">
-                  {chat.title || "Untitled Chat"}{" "}
-                  {/* Display fallback if title is missing */}
+                {chat.title || "New Chat"}
                 </span>
               </div>
             </Link>
@@ -86,14 +96,11 @@ const ChatList = () => {
         )}
       </div>
       <hr className="border-none h-0.5 bg-slate-50 opacity-10 rounded-sm mt-5 mb-5" />
-
       <div className="upgrade -mb-20 mt-auto flex items-center gap-2 text-xs ">
         <img src="/panda.svg" alt="" className="w-6 h-6 mb-8" />
         <div className="texts flex flex-col gap-1">
           <span className="font-semibold">Upgrade to PANDA AI Pro</span>
-          <span className="text-slate-500">
-            Get unlimited access to all features
-          </span>
+          <span className="text-slate-500">Get unlimited access to all features</span>
         </div>
       </div>
     </div>
