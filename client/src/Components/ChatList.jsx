@@ -31,7 +31,7 @@ const { data, error, isPending } = useQuery({
 useEffect(() => {
   const intervalId = setInterval(() => {
     queryClient.invalidateQueries("userChats");
-  }, 3000);
+  }, 0);
   return () => clearInterval(intervalId);
 }, [queryClient]);
 
@@ -51,23 +51,26 @@ useEffect(() => {
   }, [menuOpen, editingChatId, queryClient]);
   
 
+
 const handleEditTitle = async (chatId) => {
   try {
+    const finalTitle = newTitle.trim() || "New Chat"; // Ensure default title if empty
+
     await fetch(`${import.meta.env.VITE_API_URL}/api/chats/${chatId}/title`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ newTitle }),
+      body: JSON.stringify({ newTitle: finalTitle }),
     });
 
-    // Immediately refetch the chat list to get the reshuffled order
-    queryClient.invalidateQueries("userChats");
+    queryClient.invalidateQueries("userChats"); // Refresh chat list
 
     setEditingChatId(null); // Exit editing mode
   } catch (error) {
     console.error("Error updating title", error);
   }
 };
+
 
 
   const handleDeleteChat = async (chatId) => {

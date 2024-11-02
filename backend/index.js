@@ -98,7 +98,7 @@ app.post("/api/chats", requireAuth(), async (req, res) => {
       UserChats.updateOne(
         { userId },
         { $push: { chats: { _id: savedChat._id, title: chatTitle } } },
-        // { upsert: true }
+        { upsert: true }
       )
     ]);
 
@@ -199,7 +199,10 @@ app.put("/api/chats/:id", requireAuth(), async (req, res) => {
 app.put("/api/chats/:id/title", requireAuth(), async (req, res) => {
   const userId = req.auth.userId;
   const chatId = req.params.id;
-  const { newTitle } = req.body;
+  let { newTitle } = req.body;
+
+  // Set default title if newTitle is empty or whitespace
+  newTitle = newTitle.trim() || "New Chat";
 
   try {
     const chat = await Chat.findOneAndUpdate(
@@ -212,14 +215,14 @@ app.put("/api/chats/:id/title", requireAuth(), async (req, res) => {
       return res.status(404).json({ error: "Chat not found" });
     }
 
-    // Retrieve user's chats and update title at the top
+    // Update the title in the user's chat list, if it exists
     const userChats = await UserChats.findOne({ userId });
     if (userChats) {
       userChats.chats = [
         { _id: chatId, title: newTitle },
         ...userChats.chats.filter((chat) => chat._id.toString() !== chatId),
       ];
-      await userChats.save(); // Save updated `chats` array
+      await userChats.save();
     } else {
       await UserChats.create({
         userId,
@@ -227,12 +230,13 @@ app.put("/api/chats/:id/title", requireAuth(), async (req, res) => {
       });
     }
 
-    res.status(200).json({ title: chat.title });
+    res.status(200).json({ title: newTitle });
   } catch (error) {
     console.error("Error updating chat title:", error);
     res.status(500).json({ error: "Error Updating Chat Title" });
   }
 });
+
 
 // Endpoint to delete a chat
 app.delete("/api/chats/:id", requireAuth(), async (req, res) => {
