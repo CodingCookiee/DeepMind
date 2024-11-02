@@ -69,40 +69,42 @@ const generateChatTitle = async (text) => {
   }
 };
 
-// Endpoint to create a new chat
 app.post("/api/chats", requireAuth(), async (req, res) => {
   const userId = req.auth.userId;
   const { text } = req.body;
 
   try {
-    // Save chat immediately with temporary "New Chat" title
+    // Save chat with an initial message and ensure proper history structure
     const newChat = new Chat({
       userId,
       title: "New Chat",
       history: [{ role: "user", parts: [{ text }] }],
     });
+
     const savedChat = await newChat.save();
 
-    // Send initial response with new chat data
+    // Send back the new chat ID and temporary title immediately
     res.status(201).json({
       chatId: savedChat._id,
-      title: "New Chat",
+      title: 'New Chat',
     });
 
-    // Generate the chat title asynchronously based on the initial message
+    // Generate chat title asynchronously and update it in the background
     const chatTitle = await generateChatTitle(text);
-    // Update the chat title in Chat and UserChats collections independently
-    await Chat.findByIdAndUpdate(savedChat._id, { title: chatTitle });
-    await UserChats.updateOne(
-      { userId },
-      { $addToSet: { chats: { _id: savedChat._id, title: chatTitle } } },
-      { upsert: true }
-    );
+    
+    // Update the chat title and the user's chat list concurrently
+    await Promise.all([
+      Chat.findByIdAndUpdate(savedChat._id, { title: chatTitle }),
+      UserChats.updateOne(
+        { userId },
+        { $push: { chats: { _id: savedChat._id, title: chatTitle } } },
+        // { upsert: true }
+      )
+    ]);
 
     console.log(`Chat title updated to: ${chatTitle}`);
   } catch (error) {
     console.error("Error creating new chat:", error);
-    // Only one error response should be sent if the try block fails
     if (!res.headersSent) {
       res.status(500).json({ error: "Error creating new chat" });
     }
@@ -142,11 +144,13 @@ app.get("/api/userChats", requireAuth(), async (req, res) => {
   }
 });
 
-// Endpoint to fetch a specific chat
+// Fetch specific chat history and ensure correct chat ID and user ID
 app.get("/api/chats/:id", requireAuth(), async (req, res) => {
   const userId = req.auth.userId;
+  const chatId = req.params.id;
+
   try {
-    const chat = await Chat.findOne({ _id: req.params.id, userId });
+    const chat = await Chat.findOne({ _id: chatId, userId });
     if (!chat) {
       return res.status(404).json({ error: "Chat not found" });
     }
@@ -157,20 +161,18 @@ app.get("/api/chats/:id", requireAuth(), async (req, res) => {
   }
 });
 
-// Updating Existing Chat with better synchronization
+// Endpoint to update chat history
 app.put("/api/chats/:id", requireAuth(), async (req, res) => {
   const userId = req.auth.userId;
   const { question, answer, img } = req.body;
 
   const newItems = [
-    ...(question
-      ? [{ role: "user", parts: [{ text: question }], ...(img && { img }) }]
-      : []),
-    { role: "model", parts: [{ text: answer }] },
+    ...(question ? [{ role: "user", parts: [{ text: question }], ...(img && { img }) }] : []),
+    { role: "model", parts: [{ text: answer }] }
   ];
 
   try {
-    const updatedChat = await Chat.findOneAndUpdate(
+    const updatedChat = await Chat.updateOne(
       { _id: req.params.id, userId },
       {
         $push: {
@@ -178,20 +180,20 @@ app.put("/api/chats/:id", requireAuth(), async (req, res) => {
             $each: newItems,
           },
         },
-      },
-      { new: true } // This returns the updated document
+      }
     );
 
     if (!updatedChat) {
       return res.status(404).json({ error: "Chat not found" });
     }
 
-    res.status(200).json(updatedChat); // Return updated chat data
+    res.status(200).json(updatedChat);
   } catch (error) {
     console.error("Error updating chat:", error);
     res.status(500).json({ error: "Error Updating Chat" });
   }
 });
+
 
 // Edit a chat title and move it to the top
 app.put("/api/chats/:id/title", requireAuth(), async (req, res) => {

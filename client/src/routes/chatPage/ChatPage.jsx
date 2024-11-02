@@ -12,13 +12,14 @@ const ChatPage = () => {
   const pathname = useLocation().pathname;
   const chatId = pathname.split("/").pop();
 
-  const { isPending, error, data } = useQuery({
+  const { data, error, isPending } = useQuery({
     queryKey: ["chat", chatId],
     queryFn: () =>
       fetch(`${import.meta.env.VITE_API_URL}/api/chats/${chatId}`, {
         credentials: "include",
       }).then((res) => res.json()),
   });
+
 
   const { theme } = useContext(ThemeContext);
   const userBg = theme === "light" ? "bg-slate-300" : "bg-neutral-700";
@@ -53,13 +54,14 @@ const ChatPage = () => {
                 <div
                   className={`message ${
                     message.role === "user"
-                      ? "user message p-5 rounded-3xl max-w-[90%] self-end ml-auto"
+                      ? `user message p-5 rounded-3xl max-w-[90%] self-end ml-auto ${userBg}`
                       : "message p-5"
                   }`}
+                  key={i}
                 >
                   <Markdown>{message.parts[0].text}</Markdown>
                 </div>
-              </React.Fragment>
+             </React.Fragment>
             ))
           )}
           {data && <NewPrompt data={data} />}

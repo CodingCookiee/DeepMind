@@ -4,7 +4,6 @@ import React, { useEffect, useContext, useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import ChatList from "../../Components/ChatList";
 import ThemeContext from "../../ThemeContext";
-import mongoose from "mongoose";
 
 const DashBoardLayout = () => {
   const { theme } = useContext(ThemeContext);
@@ -12,42 +11,14 @@ const DashBoardLayout = () => {
   const loadingBg = theme === "light" ? "bg-slate-300" : "bg-slate-700";
   const { userId, isLoaded } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  
-  const [chatTitle, setChatTitle] = useState("New Chat");
-  const [chatId, setChatId] = useState(null);
+
+
   
   useEffect(() => {
     if (isLoaded && !userId) {
       navigate("/sign-in");
     }
   }, [isLoaded, userId, navigate]);
-
-
-  useEffect(() => {
-    const pathParts = location.pathname.split("/");
-    const extractedChatId = pathParts[pathParts.length - 1];
-    const isValidChatId = mongoose.Types.ObjectId.isValid(extractedChatId);
-
-    if (isValidChatId) {
-      setChatId(extractedChatId); 
-      const fetchChatTitle = async () => {
-        try {
-          const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/chats/${extractedChatId}/title`,
-            { credentials: "include" }
-          );
-          const result = await response.json();
-          setChatTitle(result.title || "New Chat");
-        } catch (error) {
-          console.error("Failed to fetch chat title:", error);
-        }
-      };
-      fetchChatTitle();
-    } else {
-      setChatTitle("New Chat");
-    }
-  }, []);
 
   if (!isLoaded) {
     return (
@@ -69,8 +40,8 @@ const DashBoardLayout = () => {
 
   return (
     <div className="dashboardLayout flex gap-3 pt-5 h-full">
-      <div className="menu flex-none w-56">
-        <ChatList chatId={chatId} chatTitle={chatTitle} setChatTitle={setChatTitle} /> {/* Pass both chatId and chatTitle */}
+      <div className="menu flex-none w-60">
+        <ChatList />
       </div>
       <div className={`content flex-grow p-5 overflow-y-auto ${contentBg}`}>
         <Outlet />

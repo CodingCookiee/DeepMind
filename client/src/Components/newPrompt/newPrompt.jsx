@@ -1,4 +1,3 @@
-// newPrompt.js
 import "./newPrompt.css";
 import React, { useContext, useRef, useEffect, useState } from "react";
 import ThemeContext from "../../ThemeContext";
@@ -30,35 +29,41 @@ const NewPrompt = ({ data }) => {
     aiData: {},
   });
 
-  const queryClient = useQueryClient();
-  const endRef = useRef(null);
-  const formRef = useRef(null);
-
-  // Create chat history with a fallback if data.history is empty or improperly structured
+  // Ensure the history has at least one user message
   const chatHistory = data?.history?.length
     ? data.history.map(({ role, parts }) => ({
-        role: role || "user",
+        role: role || "user", // Default to 'user' if role is missing
         parts: [{ text: parts?.[0]?.text || "" }],
       }))
     : [
         {
           role: "user",
-          parts: [{ text: "Hello, how can I help you?" }],
+          parts: [{ text: "Hello, how can I help you?" }], // Fallback if no history
         },
       ];
 
+  // Ensure the first message has role 'user'
+  if (!chatHistory[0].role || chatHistory[0].role !== "user") {
+    console.error("First content should have role 'user'");
+  }
+
+  // Initialize the chat session
   const chat = model.startChat({
     history: chatHistory,
     generationConfig: {
-      // maxOutputTokens: 100,
+      // Optional: additional generation configuration
     },
   });
+
+  const queryClient = useQueryClient();
+  const endRef = useRef(null);
+  const formRef = useRef(null);
 
   useEffect(() => {
     endRef.current.scrollIntoView({ behavior: "smooth" });
   }, [img.dbData, img.isLoading, question, answer, data]);
 
-  // Mutation to update chat
+  // Mutation to update the chat
   const mutation = useMutation({
     mutationFn: () => {
       return fetch(`${import.meta.env.VITE_API_URL}/api/chats/${data._id}`, {
@@ -72,29 +77,29 @@ const NewPrompt = ({ data }) => {
           answer,
           img: img.dbData?.filePath || undefined,
         }),
-      }).then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
-      });
+      }).then((res) => res.json());
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chat", data._id] }).then(() => {
-        formRef.current.reset();
-        setQuestion("");
-        setAnswer("");
-        setImg({
-          isLoading: false,
-          error: "",
-          dbData: {},
-          aiData: {},
+      queryClient
+        .invalidateQueries({ queryKey: ["chat", data._id] })
+        .then(() => {
+          formRef.current.reset();
+          setQuestion("");
+          setAnswer("");
+          setImg({
+            isLoading: false,
+            error: "",
+            dbData: {},
+            aiData: {},
+          });
         });
-      });
     },
-    onError: (error) => {
-      console.error("Error:", error);
+    onError: (err) => {
+      console.log(err);
     },
   });
 
+  // Function to add a new message
   const add = async (text, isInitial) => {
     if (!isInitial) setQuestion(text);
 
@@ -108,14 +113,10 @@ const NewPrompt = ({ data }) => {
         accumulatedText += chunkText;
         setAnswer(accumulatedText);
       }
-      // After the first response, trigger a mutation to update the title in the backend
-      if (isInitial) {
-        mutation.mutate();
-      }
-   
-      setImg({ isLoading: false, error: "", dbData: {}, aiData: {} });
-    } catch (error) {
-      console.error("Error:", error);
+
+      mutation.mutate();
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -127,6 +128,7 @@ const NewPrompt = ({ data }) => {
     e.target.text.value = "";
   };
 
+  // Initial chat run (if the chat has no history yet)
   const hasRun = useRef(false);
   useEffect(() => {
     if (!hasRun.current) {
@@ -135,7 +137,7 @@ const NewPrompt = ({ data }) => {
       }
       hasRun.current = true;
     }
-  }, []);
+  }, [data]);
 
   return (
     <>
