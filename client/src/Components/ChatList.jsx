@@ -1,10 +1,11 @@
 import "./chatList.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useRef, useState } from "react";
 import ThemeContext from "../ThemeContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const ChatList = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 const { data, error, isPending } = useQuery({
   queryKey: ["userChats"],
@@ -31,7 +32,7 @@ const { data, error, isPending } = useQuery({
 useEffect(() => {
   const intervalId = setInterval(() => {
     queryClient.invalidateQueries("userChats");
-  }, 0);
+  }, 100);
   return () => clearInterval(intervalId);
 }, [queryClient]);
 
@@ -73,23 +74,26 @@ const handleEditTitle = async (chatId) => {
 
 
 
-  const handleDeleteChat = async (chatId) => {
-    try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/chats/${chatId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      queryClient.invalidateQueries("userChats");
-    } catch (error) {
-      console.error("Error deleting chat", error);
-    }
-  };
+const handleDeleteChat = async (chatId) => {
+  try {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/chats/${chatId}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    queryClient.invalidateQueries("userChats");
+   
+    navigate("/dashboard"); 
+  } catch (error) {
+    console.error("Error deleting chat", error);
+  }
+};
 
-  const handleRenameOnEnter = (e, chatId) => {
-    if (e.key === "Enter") {
-      handleEditTitle(chatId);
-    }
-  };
+const handleRenameOnEnter = (e, chatId) => {
+  if (e.key === "Enter") {
+    handleEditTitle(chatId);
+  }
+};
+
 
   return (
     <div className="chatList flex flex-col p-5 h-5/6">
