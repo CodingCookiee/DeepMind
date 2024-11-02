@@ -51,11 +51,15 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 // Generate chat title using Google Gemini
 const generateChatTitle = async (text) => {
   try {
-    const result = await model.generateContent(`Provide a one sentence, single-line, maximum five words, concise 
+    const result =
+      await model.generateContent(`Provide a one sentence, single-line, maximum five words, concise 
       and title that captures the main idea of the following message: "${text}". Please provide only plain text without any markdown or symbols at the start.`);
-    
+
     const title = result.response?.text
-      ? result.response.text().trim().replace(/^#+\s*/, "")
+      ? result.response
+          .text()
+          .trim()
+          .replace(/^#+\s*/, "")
       : null;
 
     return title || "Untitled Chat";
@@ -87,7 +91,6 @@ app.post("/api/chats", requireAuth(), async (req, res) => {
 
     // Generate the chat title asynchronously based on the initial message
     const chatTitle = await generateChatTitle(text);
-
     // Update the chat title in Chat and UserChats collections independently
     await Chat.findByIdAndUpdate(savedChat._id, { title: chatTitle });
     await UserChats.updateOne(
@@ -98,10 +101,15 @@ app.post("/api/chats", requireAuth(), async (req, res) => {
 
     console.log(`Chat title updated to: ${chatTitle}`);
   } catch (error) {
-    console.error("Error creating chat:", error);
-    res.status(500).json({ error: "Error creating new chat" });
+    console.error("Error creating new chat:", error);
+    // Only one error response should be sent if the try block fails
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Error creating new chat" });
+    }
   }
 });
+
+
 // New endpoint to fetch the latest chat title
 app.get("/api/chats/:id/title", requireAuth(), async (req, res) => {
   const userId = req.auth.userId;
@@ -119,7 +127,6 @@ app.get("/api/chats/:id/title", requireAuth(), async (req, res) => {
     res.status(500).json({ error: "Error Fetching Chat Title" });
   }
 });
-
 
 // Endpoint to fetch user chats
 app.get("/api/userChats", requireAuth(), async (req, res) => {
@@ -150,18 +157,20 @@ app.get("/api/chats/:id", requireAuth(), async (req, res) => {
   }
 });
 
-// Updating Existing Chat
+// Updating Existing Chat with better synchronization
 app.put("/api/chats/:id", requireAuth(), async (req, res) => {
   const userId = req.auth.userId;
   const { question, answer, img } = req.body;
 
   const newItems = [
-    ...(question ? [{ role: 'user', parts: [{ text: question }], ...(img && { img }) }] : []),
-    { role: 'model', parts: [{ text: answer }] },
+    ...(question
+      ? [{ role: "user", parts: [{ text: question }], ...(img && { img }) }]
+      : []),
+    { role: "model", parts: [{ text: answer }] },
   ];
 
   try {
-    const updateChat = await Chat.findOneAndUpdate(
+    const updatedChat = await Chat.findOneAndUpdate(
       { _id: req.params.id, userId },
       {
         $push: {
@@ -169,29 +178,95 @@ app.put("/api/chats/:id", requireAuth(), async (req, res) => {
             $each: newItems,
           },
         },
-      }
+      },
+      { new: true } // This returns the updated document
     );
-    if (!updateChat) {
+
+    if (!updatedChat) {
       return res.status(404).json({ error: "Chat not found" });
     }
-    res.status(200).json(updateChat);
+
+    res.status(200).json(updatedChat); // Return updated chat data
   } catch (error) {
     console.error("Error updating chat:", error);
     res.status(500).json({ error: "Error Updating Chat" });
   }
 });
 
+// Edit a chat title and move it to the top
+app.put("/api/chats/:id/title", requireAuth(), async (req, res) => {
+  const userId = req.auth.userId;
+  const chatId = req.params.id;
+  const { newTitle } = req.body;
 
+  try {
+    const chat = await Chat.findOneAndUpdate(
+      { _id: chatId, userId },
+      { title: newTitle },
+      { new: true }
+    );
 
-app.listen(port, "localhost", () => {
-  connect();
-  console.log(`Server running successfully on http://localhost:${port}`);
-}).on("error", (err) => {
-  if (err.code === "EACCES") {
-    console.log(`Port ${port} requires elevated privileges. Try these solutions:
-        1. Use a port number above 1024
-        2. Run the command prompt as administrator`);
-  } else {
-    console.error("Server error:", err);
+    if (!chat) {
+      return res.status(404).json({ error: "Chat not found" });
+    }
+
+    // Retrieve user's chats and update title at the top
+    const userChats = await UserChats.findOne({ userId });
+    if (userChats) {
+      userChats.chats = [
+        { _id: chatId, title: newTitle },
+        ...userChats.chats.filter((chat) => chat._id.toString() !== chatId),
+      ];
+      await userChats.save(); // Save updated `chats` array
+    } else {
+      await UserChats.create({
+        userId,
+        chats: [{ _id: chatId, title: newTitle }],
+      });
+    }
+
+    res.status(200).json({ title: chat.title });
+  } catch (error) {
+    console.error("Error updating chat title:", error);
+    res.status(500).json({ error: "Error Updating Chat Title" });
   }
 });
+
+// Endpoint to delete a chat
+app.delete("/api/chats/:id", requireAuth(), async (req, res) => {
+  const userId = req.auth.userId;
+  const chatId = req.params.id;
+
+  try {
+    const deletedChat = await Chat.findOneAndDelete({ _id: chatId, userId });
+    if (!deletedChat) {
+      return res.status(404).json({ error: "Chat not found" });
+    }
+
+    // Remove from UserChats collection
+    await UserChats.updateOne(
+      { userId },
+      { $pull: { chats: { _id: chatId } } }
+    );
+
+    res.status(200).json({ message: "Chat deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting chat:", error);
+    res.status(500).json({ error: "Error Deleting Chat" });
+  }
+});
+
+app
+  .listen(port, "localhost", () => {
+    connect();
+    console.log(`Server running successfully on http://localhost:${port}`);
+  })
+  .on("error", (err) => {
+    if (err.code === "EACCES") {
+      console.log(`Port ${port} requires elevated privileges. Try these solutions:
+        1. Use a port number above 1024
+        2. Run the command prompt as administrator`);
+    } else {
+      console.error("Server error:", err);
+    }
+  });
