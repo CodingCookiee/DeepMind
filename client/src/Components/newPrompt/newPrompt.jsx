@@ -9,14 +9,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const NewPrompt = ({ data }) => {
   const { theme } = useContext(ThemeContext);
-  const placeholderClasses =
-    theme === "dark"
-      ? "bg-neutral-800 text-white placeholder-gray-400"
-      : "bg-slate-200 text-black placeholder-gray-600";
-  const buttonClasses =
-    theme === "dark"
-      ? "bg-neutral-800 text-white hover:bg-neutral-600"
-      : "bg-slate-200 text-black hover:bg-slate-300";
+  const placeholderClasses = theme === "dark"
+    ? "bg-neutral-800 text-white placeholder-gray-400"
+    : "bg-slate-200 text-black placeholder-gray-600";
+  const buttonClasses = theme === "dark"
+    ? "bg-neutral-800 text-white hover:bg-neutral-600"
+    : "bg-slate-200 text-black hover:bg-slate-300";
   const newFormClasses = theme === "dark" ? "bg-neutral-700" : "bg-white";
   const userBg = theme === "light" ? "bg-slate-300" : "bg-neutral-700";
 
@@ -25,34 +23,24 @@ const NewPrompt = ({ data }) => {
   const [img, setImg] = useState({
     isLoading: false,
     error: "",
-    dbData: {},
-    aiData: {},
+    dbData: {}, // Stores image data from the upload
+    aiData: {}, // Stores AI-related image data, if any
   });
 
-  // Ensure the history has at least one user message
-  const chatHistory = data?.history?.length
-    ? data.history.map(({ role, parts }) => ({
-        role: role || "user", // Default to 'user' if role is missing
-        parts: [{ text: parts?.[0]?.text || "" }],
-      }))
-    : [
-        {
-          role: "user",
-          parts: [{ text: "Hello, how can I help you?" }], // Fallback if no history
-        },
-      ];
+  const chatHistory = data?.history?.map(({ role, parts, img }) => ({
+    role: role || "user",
+    parts: [{ text: parts?.[0]?.text || "" }],
+    img, // Include image data if available in history
+  })) || [
+    {
+      role: "user",
+      parts: [{ text: "Hello, how can I help you?" }],
+    },
+  ];
 
-  // Ensure the first message has role 'user'
-  if (!chatHistory[0].role || chatHistory[0].role !== "user") {
-    console.error("First content should have role 'user'");
-  }
-
-  // Initialize the chat session
   const chat = model.startChat({
     history: chatHistory,
-    generationConfig: {
-      // Optional: additional generation configuration
-    },
+    generationConfig: {},
   });
 
   const queryClient = useQueryClient();
@@ -66,15 +54,18 @@ const NewPrompt = ({ data }) => {
   // Optimistically add the new message to the local data
   const mutation = useMutation({
     mutationFn: () => {
+      // Prepare the message body, attaching `img` if present
+      const messageBody = {
+        question: question.length ? question : undefined,
+        answer,
+        img: img.dbData?.filePath || undefined, // Attach img only if there's a valid file path
+      };
+
       return fetch(`${import.meta.env.VITE_API_URL}/api/chats/${data._id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          question: question.length ? question : undefined,
-          answer,
-          img: img.dbData?.filePath || undefined,
-        }),
+        body: JSON.stringify(messageBody),
       }).then((res) => res.json());
     },
     onMutate: async () => {
@@ -82,23 +73,28 @@ const NewPrompt = ({ data }) => {
 
       const previousChatData = queryClient.getQueryData(["chat", data._id]);
 
-      // Add new messages directly to the existing chat data
+      // Optimistically update chat history with question, answer, and img if present
       queryClient.setQueryData(["chat", data._id], (oldData) => ({
         ...oldData,
         history: [
           ...oldData.history,
-          { role: "user", parts: [{ text: question }] },
+          {
+            role: "user",
+            parts: [{ text: question }],
+            img: img.dbData?.filePath || null, // Only attach img here
+          },
           { role: "model", parts: [{ text: answer }] },
         ],
       }));
 
+      // Reset input fields and `img` state after message is sent
       formRef.current.reset();
       setQuestion("");
       setAnswer("");
       setImg({
         isLoading: false,
         error: "",
-        dbData: {},
+        dbData: {}, // Clear dbData so the image doesn't persist in future messages
         aiData: {},
       });
 
@@ -110,8 +106,6 @@ const NewPrompt = ({ data }) => {
     },
   });
 
-
-  // Function to add a new message
   const add = async (text, isInitial) => {
     if (!isInitial) setQuestion(text);
 
@@ -121,14 +115,13 @@ const NewPrompt = ({ data }) => {
       );
       let accumulatedText = "";
       for await (const chunk of result.stream) {
-        const chunkText = chunk.text();
-        accumulatedText += chunkText;
+        accumulatedText += chunk.text();
         setAnswer(accumulatedText);
       }
 
       mutation.mutate();
     } catch (err) {
-      console.log(err);
+      console.log("Error in sendMessageStream:", err);
     }
   };
 
@@ -140,25 +133,21 @@ const NewPrompt = ({ data }) => {
     e.target.text.value = "";
   };
 
-  // Initial chat run (if the chat has no history yet)
-  const hasRun = useRef(false);
-  useEffect(() => {
-    if (!hasRun.current) {
-      if (data?.history?.length === 1) {
-        add(data.history[0].parts[0].text, true);
+    // Initial chat run (if the chat has no history yet)
+    const hasRun = useRef(false);
+    useEffect(() => {
+      if (!hasRun.current) {
+        if (data?.history?.length === 1) {
+          add(data.history[0].parts[0].text, true);
+        }
+        hasRun.current = true;
       }
-      hasRun.current = true;
-    }
-  }, []);
+    }, [data]);
 
   return (
     <>
       {img.isLoading && (
-        <div
-          className={`flex items-center justify-center p-4 ${
-            theme === "dark" ? "text-white" : "text-black"
-          }`}
-        >
+        <div className={`flex items-center justify-center p-4 ${theme === "dark" ? "text-white" : "text-black"}`}>
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-current"></div>
           <span className="ml-3">Loading . . .</span>
         </div>
@@ -169,14 +158,7 @@ const NewPrompt = ({ data }) => {
           urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
           path={img.dbData.filePath}
           width="380"
-          transformation={[
-            {
-              width: 380,
-              quality: 80,
-              format: "webp",
-              progressive: true,
-            },
-          ]}
+          transformation={[{ width: 380, quality: 80, format: "webp", progressive: true }]}
           className="mt-4 mb-4"
         />
       )}

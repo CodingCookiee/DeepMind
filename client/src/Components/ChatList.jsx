@@ -34,7 +34,7 @@ useEffect(() => {
     queryClient.invalidateQueries("userChats");
   }, 1000);
   return () => clearInterval(intervalId);
-}, []);
+}, [ queryClient]);
 
 
   // Close dropdown or edit input on outside click
