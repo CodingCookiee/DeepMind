@@ -32,9 +32,9 @@ const { data, error, isPending } = useQuery({
 useEffect(() => {
   const intervalId = setInterval(() => {
     queryClient.invalidateQueries("userChats");
-  }, 100);
+  }, 1000);
   return () => clearInterval(intervalId);
-}, [queryClient]);
+}, []);
 
 
   // Close dropdown or edit input on outside click

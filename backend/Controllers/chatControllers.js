@@ -36,7 +36,7 @@ export const createChat =  async (req, res) => {
         )
       ]);
   
-      console.log(`Chat title updated to: ${chatTitle}`);
+      // console.log(`Chat title updated to: ${chatTitle}`);
     } catch (error) {
       console.error("Error creating new chat:", error);
       if (!res.headersSent) {
