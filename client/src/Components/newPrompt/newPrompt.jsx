@@ -137,7 +137,7 @@ const NewPrompt = ({ data }) => {
       }
       hasRun.current = true;
     }
-  }, [data]);
+  }, []);
 
   return (
     <>

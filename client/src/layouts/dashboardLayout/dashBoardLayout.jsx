@@ -22,7 +22,7 @@ const DashBoardLayout = () => {
 
   if (!isLoaded) {
     return (
-      <div className={`border h-full w-full max-w-xl mt-5 ${theme === "light" ? "border-gray-300" : "border-gray-700"} shadow rounded-md p-4 mx-auto`}>
+      <div className={`h-full w-full max-w-xl mt-5 ${theme === "light" ? "border-gray-300" : "border-gray-700"} shadow rounded-md p-4 mx-auto`}>
         <div className="animate-pulse flex space-x-4">
           <div className={`rounded-full ${loadingBg} `}></div>
           <div className="flex-1 space-y-4">
