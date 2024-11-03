@@ -23,14 +23,14 @@ const NewPrompt = ({ data }) => {
   const [img, setImg] = useState({
     isLoading: false,
     error: "",
-    dbData: {}, // Stores image data from the upload
-    aiData: {}, // Stores AI-related image data, if any
+    dbData: {}, 
+    aiData: {}, 
   });
 
   const chatHistory = data?.history?.map(({ role, parts, img }) => ({
     role: role || "user",
     parts: [{ text: parts?.[0]?.text || "" }],
-    img, // Include image data if available in history
+    img, 
   })) || [
     {
       role: "user",
