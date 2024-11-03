@@ -63,15 +63,13 @@ const NewPrompt = ({ data }) => {
     endRef.current.scrollIntoView({ behavior: "smooth" });
   }, [img.dbData, img.isLoading, question, answer, data]);
 
-  // Mutation to update the chat
+  // Optimistically add the new message to the local data
   const mutation = useMutation({
     mutationFn: () => {
       return fetch(`${import.meta.env.VITE_API_URL}/api/chats/${data._id}`, {
         method: "PUT",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           question: question.length ? question : undefined,
           answer,
@@ -79,25 +77,39 @@ const NewPrompt = ({ data }) => {
         }),
       }).then((res) => res.json());
     },
-    onSuccess: () => {
-      queryClient
-        .invalidateQueries({ queryKey: ["chat", data._id] })
-        .then(() => {
-          formRef.current.reset();
-          setQuestion("");
-          setAnswer("");
-          setImg({
-            isLoading: false,
-            error: "",
-            dbData: {},
-            aiData: {},
-          });
-        });
+    onMutate: async () => {
+      await queryClient.cancelQueries(["chat", data._id]);
+
+      const previousChatData = queryClient.getQueryData(["chat", data._id]);
+
+      // Add new messages directly to the existing chat data
+      queryClient.setQueryData(["chat", data._id], (oldData) => ({
+        ...oldData,
+        history: [
+          ...oldData.history,
+          { role: "user", parts: [{ text: question }] },
+          { role: "model", parts: [{ text: answer }] },
+        ],
+      }));
+
+      formRef.current.reset();
+      setQuestion("");
+      setAnswer("");
+      setImg({
+        isLoading: false,
+        error: "",
+        dbData: {},
+        aiData: {},
+      });
+
+      return { previousChatData };
     },
-    onError: (err) => {
-      console.log(err);
+    onError: (err, variables, context) => {
+      console.error("Error updating chat:", err);
+      queryClient.setQueryData(["chat", data._id], context.previousChatData);
     },
   });
+
 
   // Function to add a new message
   const add = async (text, isInitial) => {

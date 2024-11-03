@@ -14,10 +14,13 @@ const ChatPage = () => {
 
   const { data, error, isPending } = useQuery({
     queryKey: ["chat", chatId],
-    queryFn: () =>
+    queryFn: () => 
       fetch(`${import.meta.env.VITE_API_URL}/api/chats/${chatId}`, {
         credentials: "include",
       }).then((res) => res.json()),
+    refetchOnWindowFocus: false, // Prevent re-fetching on window focus
+    staleTime: Infinity,         // Keep data fresh indefinitely
+    cacheTime: Infinity          // Cache data indefinitely
   });
 
 
