@@ -27,7 +27,7 @@ app.get("/api/upload", (req, res) => {
 });
 
 // Use chat routes from `chatRoutes.js`
-app.use("/api", chatRoutes);
+app.use(chatRoutes);
 
 //  test Hello World
 app.get("/", (req, res) => {
