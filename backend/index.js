@@ -41,9 +41,9 @@ app.get('*', (req, res) => {
 });
 
 app
-  .listen(port, "localhost", async () => {
+  .listen(port, async () => {
     await connectToDatabase();
-    console.log(`Server running successfully on http://localhost:${port}`);
+    console.log(`Server running successfully on https://panda-ai-sfn1.vercel.app/:${port}`);
   })
   .on("error", (err) => {
     if (err.code === "EACCES") {
@@ -53,4 +53,4 @@ app
     } else {
       console.error("Server error:", err);
     }
-  });
+  }); 
