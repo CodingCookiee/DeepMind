@@ -31,8 +31,8 @@ app.get("/api/upload", (req, res) => {
   res.send(result);
 });
 
+app.use("/api", chatRoutes);
 
-app.use(chatRoutes);
 
 app
   .listen(port, async () => {

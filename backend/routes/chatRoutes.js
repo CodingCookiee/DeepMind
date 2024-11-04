@@ -1,4 +1,3 @@
-// express router
 import express from "express";
 import { requireAuth } from "../middleware/authMiddleware.js";
 import {
@@ -13,12 +12,12 @@ import {
 
 const router = express.Router();
 
-router.post("/api/chats", requireAuth(), createChat);
-router.get("/api/chats/:id/title", requireAuth(), fetchChatTitle);
-router.get("/api/userChats", requireAuth(), fetchUserChats);
-router.get("/api/chats/:id", requireAuth(), fetchSpecificChatHistory);
-router.put("/api/chats/:id", requireAuth(), updateChat);
-router.put("/api/chats/:id/title", requireAuth(), editChatTitle);
-router.delete("/api/chats/:id", requireAuth(), deleteChat);
+router.post("/chats", requireAuth(), createChat);
+router.get("/chats/:id/title", requireAuth(), fetchChatTitle);
+router.get("/userChats", requireAuth(), fetchUserChats);
+router.get("/chats/:id", requireAuth(), fetchSpecificChatHistory);
+router.put("/chats/:id", requireAuth(), updateChat);
+router.put("/chats/:id/title", requireAuth(), editChatTitle);
+router.delete("/chats/:id", requireAuth(), deleteChat);
 
 export default router;
