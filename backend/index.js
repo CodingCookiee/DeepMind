@@ -26,8 +26,8 @@ app.get("/api/upload", (req, res) => {
   res.send(result);
 });
 
-// Prefix routes with /api
-app.use("/api", chatRoutes);
+
+app.use(chatRoutes);
 
 app
   .listen(port, async () => {
