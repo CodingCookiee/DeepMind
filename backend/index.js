@@ -26,13 +26,13 @@ app.get("/api/upload", (req, res) => {
   res.send(result);
 });
 
-// Use chat routes from `chatRoutes.js`
-app.use(chatRoutes);
+// Prefix routes with /api
+app.use("/api", chatRoutes);
 
 app
   .listen(port, async () => {
     await connectToDatabase();
-    console.log(`Server running successfully on https://panda-ai-eyw3.vercel.app/:${port}`);
+    console.log(`Server running successfully on ${process.env.CLIENT_URL}:${port}`);
   })
   .on("error", (err) => {
     if (err.code === "EACCES") {
@@ -42,4 +42,4 @@ app
     } else {
       console.error("Server error:", err);
     }
-  }); 
+  });
