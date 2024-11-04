@@ -29,6 +29,12 @@ app.get("/api/upload", (req, res) => {
 // Use chat routes from `chatRoutes.js`
 app.use("/api", chatRoutes);
 
+//  test Hello World
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+
 app
   .listen(port, async () => {
     await connectToDatabase();
