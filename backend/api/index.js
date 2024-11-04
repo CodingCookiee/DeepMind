@@ -5,16 +5,11 @@ import { clerkMiddleware } from "./middleware/authMiddleware.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import { connectToDatabase } from "./config/database.js";
 import { imagekitInstance } from "./config/imagekit.js";
-import path from "path";
-import url from "url";
 
 dotenv.config();
 
 const app = express();
-const port = parseInt(process.env.PORT || "8000", 10);
-
-const __filename = url.fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const port = process.env.PORT || 8000;
 
 app.use(
   cors({
@@ -26,19 +21,13 @@ app.use(
 app.use(clerkMiddleware());
 app.use(express.json());
 
-
 app.get("/api/upload", (req, res) => {
   const result = imagekitInstance.getAuthenticationParameters();
   res.send(result);
 });
 
-app.use(chatRoutes);
-
-app.use(express.static(path.join(__dirname, '../client')));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client', 'index.html'));
-});
+// Use chat routes from `chatRoutes.js`
+app.use("/api", chatRoutes);
 
 app
   .listen(port, async () => {
