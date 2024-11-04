@@ -8,7 +8,7 @@ const publicKey = import.meta.env.VITE_IMAGE_KIT_PUBLIC_KEY;
 
 const authenticator = async () => {
   try {
-      const response = await fetch('`${import.meta.env.VITE_API_URL}/api/upload');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`);
       if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`Request failed with status ${response.status}: ${errorText}`);

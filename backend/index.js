@@ -32,7 +32,7 @@ app.use(chatRoutes);
 app
   .listen(port, async () => {
     await connectToDatabase();
-    console.log(`Server running successfully on https://panda-ai-eight.vercel.app/:${port}`);
+    console.log(`Server running successfully on https://panda-ai-eyw3.vercel.app/:${port}`);
   })
   .on("error", (err) => {
     if (err.code === "EACCES") {
