@@ -21,9 +21,9 @@ app.use(
 app.use(clerkMiddleware());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Welcome to the Panda AI Backend API");
-});
+// app.get("/", (req, res) => {
+//   res.send("Welcome to the Panda AI Backend API");
+// });
 
 
 app.get("/api/upload", (req, res) => {
