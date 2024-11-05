@@ -12,8 +12,8 @@ import url from "url";
 dotenv.config();
 const port = parseInt(process.env.PORT || "3000", 10);
 
-const __filename = url.fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = url.fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(clerkMiddleware());
@@ -43,10 +43,10 @@ app.get("/api/upload", (req, res) => {
 app.use("/api", chatRoutes);
 
 // Serve Static Files for Frontend
-app.use(express.static(path.join(__dirname, "../client")));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client", "index.html"));
-});
+// app.use(express.static(path.join(__dirname, "../client")));
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "../client", "index.html"));
+// });
 
 // Global Error Handler
 app.use((err, req, res, next) => {
