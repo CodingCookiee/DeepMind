@@ -10,7 +10,7 @@ import { imagekitInstance } from "./config/imagekit.js";
 
 
 dotenv.config();
-const port = parseInt(process.env.PORT || "3000", 10);
+const port = parseInt(process.env.PORT || "8000", 10);
 const app = express();
 app.use(clerkMiddleware());
 
@@ -36,31 +36,12 @@ app.get("/api/upload", (req, res) => {
 
 app.use("/api", chatRoutes);
 
-app.use("/api", chatRoutes);
-
-// Route to handle root ("/") or any non-API routes
-app.get("*", (req, res) => {
-  // Redirect all non-API requests to the frontend hosted on Netlify
-  res.redirect(process.env.CLIENT_URL);
-});
-
-// Fallback route for all unmatched API routes
-app.use("/api/*", (req, res) => {
-  res.status(404).json({ error: "API route not found" });
-});
-
-// Global Error Handler
-app.use((err, req, res, next) => {
-  console.error("Global error handler:", err);
-  res.status(500).json({ error: "Server encountered an error" });
-});
-
 // Start Server
 app
   .listen(port, async () => {
     await connectToDatabase();
     console.log(`Server running successfully on https://panda-ai.onrender.com:${port}`);
-    console.log("Backend allowed client:", process.env.CLIENT_URL);
+    console.log("Backend allowed client:",process.env.CLIENT_URL);
   })
   .on("error", (err) => {
     if (err.code === "EACCES") {
