@@ -43,20 +43,20 @@ app.get("/api/upload", (req, res) => {
 app.use("/api", chatRoutes);
 
 // Route to handle root ("/")
-app.get("/", (req, res) => {
-  res.send("API is running");
-});
+// app.get("/", (req, res) => {
+//   res.send("API is running");
+// });
 
 // Fallback route for all unmatched API routes
-app.use("/api/*", (req, res) => {
-  res.status(404).json({ error: "API route not found" });
-});
+// app.use("/api/*", (req, res) => {
+//   res.status(404).json({ error: "API route not found" });
+// });
 
 // Global Error Handler
-app.use((err, req, res, next) => {
-  console.error("Global error handler:", err);
-  res.status(500).json({ error: "Server encountered an error" });
-});
+// app.use((err, req, res, next) => {
+//   console.error("Global error handler:", err);
+//   res.status(500).json({ error: "Server encountered an error" });
+// });
 
 // PRODUCTION: Serve static files from client build
 app.use(express.static(path.join(__dirname, "../client/dist")));
