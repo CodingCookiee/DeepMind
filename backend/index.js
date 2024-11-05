@@ -16,16 +16,15 @@ const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+// app.use(clerkMiddleware());
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL, // Ensure CLIENT_URL matches https://pandai.netlify.app
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
 
-// Add Clerk middleware for authentication
-app.use(clerkMiddleware);
 
 // Parse incoming JSON
 app.use(express.json());
@@ -44,10 +43,10 @@ app.get("/api/upload", (req, res) => {
 app.use("/api", chatRoutes);
 
 // Serve Static Files for Frontend
-app.use(express.static(path.join(__dirname, "../client")));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client", "index.html"));
-});
+// app.use(express.static(path.join(__dirname, "../client")));
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "../client", "index.html"));
+// });
 
 // Global Error Handler
 app.use((err, req, res, next) => {
