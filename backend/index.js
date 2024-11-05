@@ -16,7 +16,7 @@ const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-// app.use(clerkMiddleware());
+app.use(clerkMiddleware());
 
 app.use(
   cors({
