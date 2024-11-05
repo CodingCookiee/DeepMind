@@ -41,14 +41,19 @@ app.get("/api/upload", (req, res) => {
   }
 });
 
-// API Routes
 app.use("/api", chatRoutes);
 
-
-// Catch-all for undefined API routes, returning JSON instead of HTML
+// Fallback route for all unmatched API routes
 app.use("/api/*", (req, res) => {
   res.status(404).json({ error: "API route not found" });
 });
+
+// Serve the frontend if needed
+app.use(express.static(path.join(__dirname, "../client")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client", "index.html"));
+});
+
 
 
 // Global Error Handler
