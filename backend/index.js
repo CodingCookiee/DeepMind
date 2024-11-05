@@ -43,11 +43,10 @@ app.get("/api/upload", (req, res) => {
 app.use("/api", chatRoutes);
 
 // Serve Static Files for Frontend
-app.use(express.static(path.join(__dirname, "../client/dist")));
+app.use(express.static(path.join(__dirname, "../client")));
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
+  res.sendFile(path.join(__dirname, "../client", "index.html"));
 });
-
 
 // Global Error Handler
 app.use((err, req, res, next) => {
