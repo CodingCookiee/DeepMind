@@ -24,9 +24,12 @@ app.use(
 app.use(express.json());
 
 // Root Route - Informative message for root path
-app.get("/", (req, res) => {
-  res.send("API is running. Please access the endpoints via /api.");
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.get("/", (req, res) => {
+    res.send("API is running. Please access the endpoints via /api.");
+  });
+}
+
 
 // API Route for ImageKit Authentication
 app.get("/api/upload", (req, res) => {
@@ -59,6 +62,7 @@ app
   .listen(port, async () => {
     await connectToDatabase();
     console.log(`Server running successfully on https://panda-ai.onrender.com:${port}`);
+    console.log("Backend allowed client:", process.env.CLIENT_URL);
   })
   .on("error", (err) => {
     if (err.code === "EACCES") {
