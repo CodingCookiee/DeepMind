@@ -9,7 +9,6 @@ import {
   editChatTitle,
   deleteChat,
 } from "../Controllers/chatControllers.js";
-import {requireAuth} from '../middleware/authMiddleware'
 
 const router = express.Router();
 
