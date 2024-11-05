@@ -7,9 +7,8 @@ import { connectToDatabase } from "./config/database.js";
 import { imagekitInstance } from "./config/imagekit.js";
 
 dotenv.config();
-
-const app = express();
 const port = process.env.PORT || 3000;
+const app = express();
 
 app.use(
   cors({
@@ -20,10 +19,6 @@ app.use(
 
 app.use(clerkMiddleware());
 app.use(express.json());
-
-// app.get("/", (req, res) => {
-//   res.send("Welcome to the Panda AI Backend API");
-// });
 
 
 app.get("/api/upload", (req, res) => {
