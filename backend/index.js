@@ -43,7 +43,7 @@ app.get('*', (req, res) => {
 app
   .listen(port, async () => {
     await connectToDatabase();
-    console.log(`Server running successfully on http://localhost:${port}`);
+    console.log(`Server running successfully on https://panda-ai.onrender.com:${port}`);
   })
   .on("error", (err) => {
     if (err.code === "EACCES") {
