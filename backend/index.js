@@ -12,7 +12,7 @@ import { imagekitInstance } from "./config/imagekit.js";
 dotenv.config();
 const port = parseInt(process.env.PORT || "8000", 10);
 const app = express();
-app.use(clerkMiddleware());
+// app.use(clerkMiddleware());
 
 app.use(
   cors({
