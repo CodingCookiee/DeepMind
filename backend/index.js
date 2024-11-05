@@ -40,6 +40,11 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client', 'index.html'));
 });
 
+app.use((err, req, res, next) => {
+  console.error("Global error handler:", err);
+  res.status(500).json({ error: "Server encountered an error" });
+});
+
 
 app
   .listen(port, async () => {
