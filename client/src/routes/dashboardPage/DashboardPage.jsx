@@ -21,11 +21,17 @@ const DashboardPage = () => {
           },
           body: JSON.stringify({ text })
         },
-      ).then(res => {
-          if (!res.ok) throw new Error('Network response was not ok');
+      ).then(async (res) => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
           return res.json();
-        });
-      },
+        } else {
+          throw new Error("Expected JSON response but received HTML");
+        }
+      });
+    },
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ['userChats'] });
         navigate(`/dashboard/chats/${data.chatId}`);
