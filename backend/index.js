@@ -41,6 +41,13 @@ app.get("/api/upload", (req, res) => {
 // API Routes
 app.use("/api", chatRoutes);
 
+
+// Catch-all for undefined API routes, returning JSON instead of HTML
+app.use("/api/*", (req, res) => {
+  res.status(404).json({ error: "API route not found" });
+});
+
+
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error("Global error handler:", err);
