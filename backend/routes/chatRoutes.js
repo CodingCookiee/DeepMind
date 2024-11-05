@@ -8,7 +8,7 @@ import {
   updateChat,
   editChatTitle,
   deleteChat,
-} from "../Controllers/chatControllers.js";
+} from "../controllers/chatControllers.js";
 
 const router = express.Router();
 

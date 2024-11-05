@@ -6,9 +6,6 @@ import { clerkMiddleware } from "./middleware/authMiddleware.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import { connectToDatabase } from "./config/database.js";
 import { imagekitInstance } from "./config/imagekit.js";
-import url from "url";
-import path from "path";
-
 
 dotenv.config();
 const port = parseInt(process.env.PORT || "3000", 10);
@@ -18,7 +15,7 @@ app.use(clerkMiddleware());
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL, 
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
@@ -30,15 +27,16 @@ app.use(express.json());
 app.get("/api/upload", (req, res) => {
   try {
     const result = imagekitInstance.getAuthenticationParameters();
-    res.json(result); // Send JSON response
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: "ImageKit authentication error" });
   }
 });
 
+// Mount API routes under /api
 app.use("/api", chatRoutes);
 
-// Fallback route for all unmatched API routes
+// Catch-all for unmatched API routes
 app.use("/api/*", (req, res) => {
   res.status(404).json({ error: "API route not found" });
 });
@@ -53,7 +51,7 @@ app.use((err, req, res, next) => {
 app
   .listen(port, async () => {
     await connectToDatabase();
-    console.log(`Server running successfully on https://panda-ai.onrender.com:${port}`);
+    console.log(`Server running successfully on ${process.env.CLIENT_URL}:${port}`);
     console.log("Backend allowed client:", process.env.CLIENT_URL);
   })
   .on("error", (err) => {
