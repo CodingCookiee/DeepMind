@@ -26,14 +26,6 @@ app.use(
 // Parse incoming JSON
 app.use(express.json());
 
-// Root Route - Informative message for root path
-if (process.env.NODE_ENV !== 'production') {
-  app.get("/", (req, res) => {
-    res.send("API is running. Please access the endpoints via /api.");
-  });
-}
-
-
 // API Route for ImageKit Authentication
 app.get("/api/upload", (req, res) => {
   try {
