@@ -11,19 +11,19 @@ const DashboardPage = () => {
   const navigate = useNavigate();
     
   // Mutations
-    const mutation = useMutation({
-      mutationFn: (text) => {
-        return fetch(`${import.meta.env.VITE_API_URL}/api/chats`, {
-          method: 'POST',
-          credentials: 'include',
-          headers:{
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ text })
+  const mutation = useMutation({
+    mutationFn: (text) => {
+      return fetch(`${import.meta.env.VITE_API_URL}/api/chats`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
         },
-      ).then(async (res) => {
+        body: JSON.stringify({ text })
+      }).then(async (res) => {
         if (!res.ok) throw new Error('Network response was not ok');
-        
+  
+        // Ensure the response is JSON
         const contentType = res.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
           return res.json();
@@ -32,13 +32,15 @@ const DashboardPage = () => {
         }
       });
     },
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: ['userChats'] });
-        navigate(`/dashboard/chats/${data.chatId}`);
-      }, onError: (error) => {
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['userChats'] });
+      navigate(`/dashboard/chats/${data.chatId}`);
+    },
+    onError: (error) => {
       console.error('Error:', error);
     },
-    })
+  });
+  
 
   const handleSubmit = async (e) =>{
     e.preventDefault();
