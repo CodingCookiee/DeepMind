@@ -1,3 +1,4 @@
+// index.js
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
@@ -15,37 +16,46 @@ const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-// app.use(clerkMiddleware());
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: process.env.CLIENT_URL, // Ensure CLIENT_URL matches https://pandai.netlify.app
     credentials: true,
   })
 );
 
+// Add Clerk middleware for authentication
+app.use(clerkMiddleware);
 
+// Parse incoming JSON
 app.use(express.json());
 
-
+// API Route for ImageKit Authentication
 app.get("/api/upload", (req, res) => {
-  const result = imagekitInstance.getAuthenticationParameters();
-  res.send(result);
+  try {
+    const result = imagekitInstance.getAuthenticationParameters();
+    res.json(result); // Send JSON response
+  } catch (error) {
+    res.status(500).json({ error: "ImageKit authentication error" });
+  }
 });
 
+// API Routes
 app.use("/api", chatRoutes);
 
-app.use(express.static(path.join(__dirname, '../client')));
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client', 'index.html'));
+// Serve Static Files for Frontend
+app.use(express.static(path.join(__dirname, "../client")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client", "index.html"));
 });
 
+// Global Error Handler
 app.use((err, req, res, next) => {
   console.error("Global error handler:", err);
   res.status(500).json({ error: "Server encountered an error" });
 });
 
-
+// Start Server
 app
   .listen(port, async () => {
     await connectToDatabase();
