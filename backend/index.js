@@ -6,7 +6,7 @@ import { clerkMiddleware } from "./middleware/authMiddleware.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import { connectToDatabase } from "./config/database.js";
 import { imagekitInstance } from "./config/imagekit.js";
-import url from "url";
+import { fileURLToPath } from "url"
 import path from "path";
 
 
@@ -16,8 +16,7 @@ const port = parseInt(process.env.PORT || "3000", 10);
 const app = express();
 app.use(clerkMiddleware());
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.resolve();
 
 
 
@@ -59,7 +58,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Server encountered an error" });
 });
 
-// PRODUCTION
+// PRODUCTION: Serve static files from client build
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
 app.get("*", (req, res) => {
