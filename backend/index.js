@@ -6,6 +6,12 @@ import { clerkMiddleware } from "./middleware/authMiddleware.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import { connectToDatabase } from "./config/database.js";
 import { imagekitInstance } from "./config/imagekit.js";
+import url from "url";
+import path from "path";
+
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 dotenv.config();
 const port = parseInt(process.env.PORT || "3000", 10);
