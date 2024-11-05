@@ -4,6 +4,7 @@ import { generateChatTitle } from "../utils/generateChatTitle.js";
 
 // Endpoint to create a new chat
 export const createChat =  async (req, res) => {
+  console.log("User ID:", req.auth?.userId);
     const userId = req.auth.userId;
     const { text } = req.body;
   
