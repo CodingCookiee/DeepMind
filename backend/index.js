@@ -38,6 +38,11 @@ app.get("/api/upload", (req, res) => {
 
 app.use("/api", chatRoutes);
 
+// Route to handle root ("/")
+app.get("/", (req, res) => {
+  res.send("API is running");
+});
+
 // Fallback route for all unmatched API routes
 app.use("/api/*", (req, res) => {
   res.status(404).json({ error: "API route not found" });
