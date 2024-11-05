@@ -20,7 +20,9 @@ const DashboardPage = () => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ text })
-        }).then(res => {
+        },
+        console.log(import.meta.env.VITE_API_URL)
+      ).then(res => {
           if (!res.ok) throw new Error('Network response was not ok');
           return res.json();
         });

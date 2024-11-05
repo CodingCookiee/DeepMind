@@ -13,7 +13,9 @@ const port = parseInt(process.env.PORT || "8000", 10);
 
 // const __filename = url.fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);
+
 const app = express();
+// app.use(clerkMiddleware());
 
 app.use(
   cors({
