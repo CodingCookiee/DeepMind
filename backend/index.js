@@ -22,7 +22,7 @@ app.use(
   })
 );
 
-// app.use(clerkMiddleware());
+app.use(clerkMiddleware());
 app.use(express.json());
 
 
