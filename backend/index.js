@@ -6,8 +6,6 @@ import { clerkMiddleware } from "./middleware/authMiddleware.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import { connectToDatabase } from "./config/database.js";
 import { imagekitInstance } from "./config/imagekit.js";
-import { fileURLToPath } from "url"
-import path from "path";
 
 
 
@@ -15,10 +13,6 @@ dotenv.config();
 const port = parseInt(process.env.PORT || "3000", 10);
 const app = express();
 app.use(clerkMiddleware());
-
-const __dirname = path.resolve();
-
-
 
 app.use(
   cors({
@@ -42,27 +36,23 @@ app.get("/api/upload", (req, res) => {
 
 app.use("/api", chatRoutes);
 
-// Route to handle root ("/")
-// app.get("/", (req, res) => {
-//   res.send("API is running");
-// });
+app.use("/api", chatRoutes);
+
+// Route to handle root ("/") or any non-API routes
+app.get("*", (req, res) => {
+  // Redirect all non-API requests to the frontend hosted on Netlify
+  res.redirect(process.env.CLIENT_URL);
+});
 
 // Fallback route for all unmatched API routes
-// app.use("/api/*", (req, res) => {
-//   res.status(404).json({ error: "API route not found" });
-// });
+app.use("/api/*", (req, res) => {
+  res.status(404).json({ error: "API route not found" });
+});
 
 // Global Error Handler
-// app.use((err, req, res, next) => {
-//   console.error("Global error handler:", err);
-//   res.status(500).json({ error: "Server encountered an error" });
-// });
-
-// PRODUCTION: Serve static files from client build
-app.use(express.static(path.join(__dirname, "../client/dist")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
+app.use((err, req, res, next) => {
+  console.error("Global error handler:", err);
+  res.status(500).json({ error: "Server encountered an error" });
 });
 
 // Start Server
