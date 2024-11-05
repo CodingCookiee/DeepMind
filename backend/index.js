@@ -9,9 +9,6 @@ import { imagekitInstance } from "./config/imagekit.js";
 import url from "url";
 import path from "path";
 
-const __filename = url.fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 
 dotenv.config();
 const port = parseInt(process.env.PORT || "3000", 10);
@@ -53,14 +50,6 @@ app.use("/api", chatRoutes);
 app.use("/api/*", (req, res) => {
   res.status(404).json({ error: "API route not found" });
 });
-
-// Serve the frontend if needed
-app.use(express.static(path.join(__dirname, "../client")));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client", "index.html"));
-});
-
-
 
 // Global Error Handler
 app.use((err, req, res, next) => {
