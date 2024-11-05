@@ -4,7 +4,7 @@ import { generateChatTitle } from "../utils/generateChatTitle.js";
 
 // Endpoint to create a new chat
 export const createChat =  async (req, res) => {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     const { text } = req.body;
   
     try {
@@ -48,7 +48,7 @@ export const createChat =  async (req, res) => {
   
   // New endpoint to fetch the latest chat title
   export const fetchChatTitle = async (req, res) => {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     const chatId = req.params.id;
   
     try {
@@ -66,7 +66,7 @@ export const createChat =  async (req, res) => {
   
   // Endpoint to fetch user chats
    export const  fetchUserChats = async (req, res) => {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     try {
       const userChats = await UserChats.findOne({ userId });
       if (!userChats) {
@@ -80,7 +80,7 @@ export const createChat =  async (req, res) => {
   
   // Fetch specific chat history and ensure correct chat ID and user ID
 export const fetchSpecificChatHistory = async (req, res) => {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     const chatId = req.params.id;
   
     try {
@@ -97,7 +97,7 @@ export const fetchSpecificChatHistory = async (req, res) => {
   
   // Endpoint to update chat history
   export const updateChat = async (req, res) => {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     const { question, answer, img } = req.body;
   
     const newItems = [
@@ -131,7 +131,7 @@ export const fetchSpecificChatHistory = async (req, res) => {
   
   // Edit a chat title and move it to the top
   export const editChatTitle = async (req, res) => {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     const chatId = req.params.id;
     let { newTitle } = req.body;
   
@@ -174,7 +174,7 @@ export const fetchSpecificChatHistory = async (req, res) => {
   
   // Endpoint to delete a chat
  export const deleteChat = async (req, res) => {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     const chatId = req.params.id;
   
     try {
