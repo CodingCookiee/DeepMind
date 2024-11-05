@@ -11,11 +11,11 @@ import url from "url";
 dotenv.config();
 const port = parseInt(process.env.PORT || "8000", 10);
 
-// const __filename = url.fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-// app.use(clerkMiddleware());
+app.use(clerkMiddleware());
 
 app.use(
   cors({
@@ -35,10 +35,10 @@ app.get("/api/upload", (req, res) => {
 
 app.use("/api", chatRoutes);
 
-// app.use(express.static(path.join(__dirname, '../client')));
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../client', 'index.html'));
-// });
+app.use(express.static(path.join(__dirname, '../client')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client', 'index.html'));
+});
 
 
 app
