@@ -6,13 +6,19 @@ import { clerkMiddleware } from "./middleware/authMiddleware.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import { connectToDatabase } from "./config/database.js";
 import { imagekitInstance } from "./config/imagekit.js";
+import path from "path";
+import url, { fileURLToPath } from "url";
 
 
 
 dotenv.config();
 const port = parseInt(process.env.PORT || "8000", 10);
 const app = express();
-// app.use(clerkMiddleware());
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(clerkMiddleware());
 
 app.use(
   cors({
@@ -35,6 +41,13 @@ app.get("/api/upload", (req, res) => {
 });
 
 app.use("/api", chatRoutes);
+
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, "../client/dist")));
+// Serve the index.html file for all other routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+})
 
 // Start Server
 app
