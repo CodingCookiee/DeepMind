@@ -30,7 +30,7 @@ const NewPrompt = ({ data }) => {
   const chatHistory = data?.history?.map(({ role, parts, img }) => ({
     role: role || "user",
     parts: [{ text: parts?.[0]?.text || "" }],
-    img, 
+
   })) || [
     {
       role: "user",
