@@ -1,5 +1,5 @@
 
-# Notes App
+# PANDA AI : AI ChatBot
 
 
 
@@ -12,9 +12,8 @@
 
 
 ## Powered By
-. MERN(MongoDB, Express, Node, React)
-. Tailwind CSS & CSS 3
-. Clerk(uAuth)
-. Vite
-. Render
-
+ - [ MERN(MongoDB, Express, Node, React)]
+ - [Tailwind CSS & CSS 3]
+ - [Clerk(uAuth)]
+ - [Vite]
+ - [Render]
