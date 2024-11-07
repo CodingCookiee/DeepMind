@@ -8,7 +8,7 @@
 
 
 
-![App Screenshot](/app.png)
+![App Screenshot](./client/public/app.png)
 
 
 ## Powered By
