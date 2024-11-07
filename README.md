@@ -13,4 +13,5 @@
 ## Powered By
  - MERN(MongoDB, Express, Node, React)
  - Tailwind CSS & CSS 3
+ - Google Gemini API
  - Clerk(uAuth)
