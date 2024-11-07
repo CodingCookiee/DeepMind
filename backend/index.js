@@ -43,10 +43,10 @@ app.get("/api/upload", (req, res) => {
 app.use("/api", chatRoutes);
 
 // Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, "../client/dist")));
+app.use(express.static(path.join(__dirname, "./client/dist")));
 // Serve the index.html file for all other routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+  res.sendFile(path.join(__dirname, "./client/dist/index.html"));
 })
 
 // Start Server
