@@ -4,8 +4,7 @@
 
 
 
-## [🔗LiveDemo](https://pandaai.up.railway.app) - Railway App
-## [🔗LiveDemo](https://pandaai.onrender.com/) - Render
+## [🔗LiveDemo](https://pandaai.up.railway.app) 
 
 ![App Screenshot](./client/public/app.png)
 
