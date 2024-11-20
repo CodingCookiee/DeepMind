@@ -1,4 +1,4 @@
-import { model } from "../config/googleGenerativeAI.js";
+import model from "../config/googleGenerativeAI.js";
 
 export const generateChatTitle = async (text) => {
   try {
